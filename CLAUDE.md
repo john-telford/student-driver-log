@@ -1,7 +1,7 @@
 # student-driver-log
 
 Personal project. Illinois learner's permit hour tracker for John's son Jimmy.
-MVP is single-user. v1.0 adds multi-user + Google OAuth. v1.5 adds iOS app.
+MVP is simple with parent and student accounts; v1.0 adds Google OAuth. v1.5 adds iOS app.
 Do not build v1.0 or v1.5 features unless explicitly asked.
 
 ## Stack
@@ -42,7 +42,7 @@ Do not build v1.0 or v1.5 features unless explicitly asked.
 - Do not write barrel files / index.ts re-exports
 - Do not add abstraction layers "for future flexibility". YAGNI
 - Do not touch `.env.local` or commit secrets
-- Do not build v1.0 or v1.5 features (multi-user, OAuth, mobile, GPS)
+- Do not build v1.0 or v1.5 features (OAuth, mobile, GPS)
 
 ## Context files
 - `SPEC.md` — requirements and data model
