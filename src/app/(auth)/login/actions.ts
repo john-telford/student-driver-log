@@ -11,15 +11,14 @@ export async function loginAction(
 ): Promise<LoginState> {
   try {
     await signIn('credentials', {
-      username: formData.get('username'),
+      email: formData.get('email'),
       password: formData.get('password'),
       redirectTo: '/dashboard',
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: 'Invalid username or password.' };
+      return { error: 'Invalid email or password.' };
     }
-    // signIn throws a redirect — re-throw so Next.js can handle it
     throw error;
   }
 }

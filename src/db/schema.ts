@@ -11,7 +11,7 @@ export type WeatherCondition = (typeof weatherConditions)[number];
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  username: text('username').notNull().unique(),
+  email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   name: text('name').notNull(),
   userType: text('user_type', { enum: userTypes }).notNull(),

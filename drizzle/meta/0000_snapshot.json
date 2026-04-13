@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5f53305d-017f-43d7-b934-382ac3cd75c3",
+  "id": "32c1fc0f-bd47-4297-b90d-89e06ebcc3dd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "trips": {
@@ -124,8 +124,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "username": {
-          "name": "username",
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -169,10 +169,10 @@
         }
       },
       "indexes": {
-        "users_username_unique": {
-          "name": "users_username_unique",
+        "users_email_unique": {
+          "name": "users_email_unique",
           "columns": [
-            "username"
+            "email"
           ],
           "isUnique": true
         }

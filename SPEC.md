@@ -6,8 +6,8 @@ and generate a printable report matching the Illinois SOS 50-hour requirement.
 
 ## Users (MVP)
 Two account types: parent and student.
-- Parents self-register (username + password)
-- Parents create student accounts from their dashboard (parent sets username + password for student)
+- Parents self-register (email + password)
+- Parents create student accounts from their dashboard (parent sets student email + password)
 - Students cannot self-register
 - Both parents and students can log, edit, and delete trips
 - Students can view their own dashboard and report only
@@ -18,7 +18,7 @@ Two account types: parent and student.
 - v1.5: iOS app with GPS-based start/stop trip tracking
 
 ## Data Model
-**users**: id, username, password_hash, name, user_type, parent_id, created_at
+**users**: id, email, password_hash, name, user_type, parent_id, created_at
 **trips**: id, student_id, created_by, trip_date, location_type, weather, daytime_minutes,
            nighttime_minutes, notes, created_at
 
@@ -61,5 +61,5 @@ Nighttime | Nighttime Total | Grand Total | Initials
 - nighttime_minutes: integer, 0 to 600
 - At least one of daytime_minutes or nighttime_minutes must be > 0
 - notes: optional, max 500 characters
-- username: required, 3 to 32 chars, alphanumeric plus underscore
+- email: required, valid email format, unique across all users
 - password: required, minimum 8 characters
