@@ -15,7 +15,7 @@ CREATE TABLE `trips` (
 --> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`username` text NOT NULL,
+	`email` text NOT NULL,
 	`password_hash` text NOT NULL,
 	`name` text NOT NULL,
 	`user_type` text NOT NULL,
@@ -24,4 +24,4 @@ CREATE TABLE `users` (
 	FOREIGN KEY (`parent_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
