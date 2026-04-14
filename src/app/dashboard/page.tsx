@@ -4,15 +4,25 @@ export default async function DashboardPage() {
   const session = await auth();
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p className="mt-2 text-gray-600">
-        Welcome, {session?.user?.name}
-        {session?.user?.userType === 'parent' ? ' (parent)' : ' (student)'}
-      </p>
-      <p className="mt-4 text-sm text-gray-400">
-        Full dashboard coming in issue #7.
-      </p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-black uppercase tracking-wide text-foreground">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Welcome back, {session?.user?.name}.
+        </p>
+      </div>
+
+      {/* Progress summary — built in issue #7 */}
+      <div className="rounded-sm border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+        Hour totals and progress bar coming in issue #7.
+      </div>
+
+      {/* Recent trips — built in issue #6 */}
+      <div className="rounded-sm border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+        Recent trips list coming in issue #6.
+      </div>
     </div>
   );
 }
