@@ -110,38 +110,6 @@ export default async function DashboardPage() {
         <p className="text-sm text-muted-foreground mt-1">Welcome back, {name}.</p>
       </div>
 
-      {/* Parent: student list */}
-      {userType === 'parent' && (
-        <div className="rounded border border-border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Students</h2>
-            <Link
-              href="/students/new"
-              className="text-xs font-bold text-primary uppercase tracking-widest hover:underline"
-            >
-              + Add a Student
-            </Link>
-          </div>
-          {students.length > 0 ? (
-            <ul className="space-y-1">
-              {students.map((s) => (
-                <li key={s.id} className="flex items-center gap-3 text-sm">
-                  <span className="font-semibold text-foreground">{s.name}</span>
-                  <span className="text-muted-foreground">{s.email}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No students yet.{' '}
-              <Link href="/students/new" className="font-semibold text-primary hover:underline">
-                Add one to get started.
-              </Link>
-            </p>
-          )}
-        </div>
-      )}
-
       {/* Hour totals + progress */}
       {selectedStudentId ? (
         <div className="rounded border border-border bg-card p-6 space-y-6">
@@ -239,6 +207,38 @@ export default async function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Parent: student list */}
+      {userType === 'parent' && (
+        <div className="rounded border border-border bg-card p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Students</h2>
+            <Link
+              href="/students/new"
+              className="text-xs font-bold text-primary uppercase tracking-widest hover:underline"
+            >
+              + Add a Student
+            </Link>
+          </div>
+          {students.length > 0 ? (
+            <ul className="space-y-1">
+              {students.map((s) => (
+                <li key={s.id} className="flex items-center gap-3 text-sm">
+                  <span className="font-semibold text-foreground">{s.name}</span>
+                  <span className="text-muted-foreground">{s.email}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No students yet.{' '}
+              <Link href="/students/new" className="font-semibold text-primary hover:underline">
+                Add one to get started.
+              </Link>
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
