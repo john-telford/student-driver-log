@@ -78,7 +78,8 @@ export default function AppNav({
 
       {/* Mobile hamburger — ml-auto pushes it to the right */}
       <button
-        className="sm:hidden ml-auto text-white p-1 -mr-1"
+        type="button"
+        className="sm:hidden ml-auto text-white p-2 -mr-2 touch-manipulation"
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? 'Close menu' : 'Open menu'}
       >
