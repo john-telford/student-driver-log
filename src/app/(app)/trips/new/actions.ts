@@ -7,6 +7,7 @@ import { trips, users, locationTypes, weatherConditions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export type TripFormState = {
+  success?: true;
   errors?: {
     studentId?: string;
     tripDate?: string;
@@ -87,5 +88,5 @@ export async function createTripAction(
     notes: notes || null,
   });
 
-  redirect('/trips?success=1');
+  return { success: true };
 }

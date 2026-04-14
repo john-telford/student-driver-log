@@ -22,6 +22,8 @@ const weatherLabels: Record<typeof weatherConditions[number], string> = {
   ice:   'Ice',
 };
 
+import type { UserType } from '@/db/schema';
+
 type Student = { id: number; name: string };
 
 const inputClass =
@@ -32,14 +34,45 @@ const labelClass = 'block text-xs font-bold text-foreground uppercase tracking-w
 
 const errorClass = 'mt-1 text-xs text-destructive font-medium';
 
-export default function TripForm({ students }: { students: Student[] }) {
+export default function TripForm({ students, userType }: { students: Student[]; userType: UserType }) {
   const [state, action, pending] = useActionState<TripFormState | undefined, FormData>(
     createTripAction,
     undefined
   );
 
-  const isParent = students.length > 0;
+  const isParent = userType === 'parent';
   const today = new Date().toISOString().split('T')[0];
+
+  if (state?.success) {
+    return (
+      <div className="text-center space-y-6 py-4">
+        <div className="space-y-2">
+          <p className="text-4xl">✓</p>
+          <h2 className="text-xl font-black uppercase tracking-wide text-foreground">
+            Trip Logged
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            The driving session has been saved.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/dashboard"
+            className="rounded bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground uppercase tracking-widest hover:opacity-90 text-center"
+          >
+            Go to Dashboard
+          </Link>
+          {/* href to same page triggers a full navigation, resetting form state */}
+          <a
+            href="/trips/new"
+            className="rounded border border-border px-6 py-2.5 text-sm font-bold text-foreground uppercase tracking-widest hover:bg-muted text-center"
+          >
+            Log Another Trip
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form action={action} className="space-y-5">
