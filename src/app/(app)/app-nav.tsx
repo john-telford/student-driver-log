@@ -46,7 +46,7 @@ export default function AppNav({
 
       {/* Mobile — native details/summary, no JS toggle needed */}
       <details className="group sm:hidden ml-auto">
-        <summary className="list-none cursor-pointer select-none text-white p-3 -mr-3">
+        <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none text-white p-3 -mr-3">
           {/* Hamburger / close icons toggle via CSS group-open */}
           <svg className="group-open:hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="3" y1="6"  x2="21" y2="6"  />
