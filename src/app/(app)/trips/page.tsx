@@ -3,9 +3,9 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { trips, users, type UserType } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import TripsTable from './trips-table';
+import { resolveSelectedStudentId } from '../actions';
 
 export default async function TripsPage() {
   const session = await auth();
@@ -19,35 +19,23 @@ export default async function TripsPage() {
   let studentName: string | null = null;
 
   if (userType === 'parent') {
-    const jar = await cookies();
-    const cookieVal = jar.get('selected_student_id')?.value;
-    if (!cookieVal) {
+    const resolved = await resolveSelectedStudentId(userId);
+    if (!resolved) {
       return (
         <div className="space-y-4">
           <h1 className="text-xl font-black uppercase tracking-wide text-foreground">Trips</h1>
           <div className="rounded border border-border bg-card p-6 text-sm text-muted-foreground">
-            Select a student from the nav bar to view their trips.
+            Add a student first to view trips.
           </div>
         </div>
       );
     }
-    studentId = Number(cookieVal);
-    // Verify student belongs to this parent and get name
+    studentId = resolved;
     const [student] = await db
-      .select({ id: users.id, name: users.name })
+      .select({ name: users.name })
       .from(users)
       .where(and(eq(users.id, studentId), eq(users.parentId, userId)));
-    if (!student) {
-      return (
-        <div className="space-y-4">
-          <h1 className="text-xl font-black uppercase tracking-wide text-foreground">Trips</h1>
-          <div className="rounded border border-border bg-card p-6 text-sm text-muted-foreground">
-            Select a student from the nav bar.
-          </div>
-        </div>
-      );
-    }
-    studentName = student.name;
+    studentName = student?.name ?? null;
   } else {
     studentId = userId;
   }

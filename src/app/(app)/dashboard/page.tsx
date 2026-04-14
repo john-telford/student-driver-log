@@ -2,8 +2,8 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users, trips, type UserType } from '@/db/schema';
 import { eq, and, desc, sum } from 'drizzle-orm';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { resolveSelectedStudentId } from '../actions';
 
 // Illinois learner permit requirements
 const TOTAL_REQUIRED_MIN = 50 * 60;   // 3000 min
@@ -53,22 +53,17 @@ export default async function DashboardPage() {
       .where(eq(users.parentId, userId));
   }
 
-  // Resolve selected student (cookie for parents, self for students)
+  // Resolve selected student (falls back to first student if no cookie)
   let selectedStudentId: number | null = null;
   let selectedStudentName: string | null = null;
   if (userType === 'parent') {
-    const jar = await cookies();
-    const cookieVal = jar.get('selected_student_id')?.value;
-    if (cookieVal) {
-      const studentId = Number(cookieVal);
+    selectedStudentId = await resolveSelectedStudentId(userId);
+    if (selectedStudentId) {
       const [student] = await db
-        .select({ id: users.id, name: users.name })
+        .select({ name: users.name })
         .from(users)
-        .where(and(eq(users.id, studentId), eq(users.parentId, userId)));
-      if (student) {
-        selectedStudentId = studentId;
-        selectedStudentName = student.name;
-      }
+        .where(and(eq(users.id, selectedStudentId), eq(users.parentId, userId)));
+      selectedStudentName = student?.name ?? null;
     }
   } else {
     selectedStudentId = userId;
