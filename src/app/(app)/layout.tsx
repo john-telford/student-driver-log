@@ -3,10 +3,12 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { logoutAction } from './dashboard/actions';
+import StudentSelector from './student-selector';
 
-export default async function DashboardLayout({
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -16,7 +18,6 @@ export default async function DashboardLayout({
 
   const { id, name, userType } = session.user;
 
-  // Parents see a list of their students in the nav
   let students: { id: number; name: string }[] = [];
   if (userType === 'parent') {
     students = await db
@@ -25,24 +26,39 @@ export default async function DashboardLayout({
       .where(eq(users.parentId, Number(id)));
   }
 
+  // Resolve which student is selected (cookie → first student → none)
+  const jar = await cookies();
+  const cookieVal = jar.get('selected_student_id')?.value;
+  const cookieId = cookieVal ? Number(cookieVal) : null;
+  const selectedStudent =
+    students.find((s) => s.id === cookieId) ?? students[0] ?? null;
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top nav */}
       <header className="bg-primary border-b-4 border-accent">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-4">
           {/* App name */}
-          <Link href="/dashboard" className="text-white font-black text-sm uppercase tracking-widest shrink-0 hover:opacity-80">
+          <Link
+            href="/dashboard"
+            className="text-white font-black text-sm uppercase tracking-widest shrink-0 hover:opacity-80"
+          >
             Student Driver Log
           </Link>
 
           {/* Nav links */}
           <nav className="flex items-center gap-4 ml-4">
-            <Link href="/trips" className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white">
+            <Link
+              href="/trips"
+              className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white"
+            >
               Trips
             </Link>
-            {/* Only show Log Trip when a parent has students, or always for students */}
             {(userType === 'student' || (userType === 'parent' && students.length > 0)) && (
-              <Link href="/trips/new" className="rounded bg-accent px-3 py-1 text-xs font-black text-accent-foreground uppercase tracking-widest hover:opacity-90">
+              <Link
+                href="/trips/new"
+                className="rounded bg-accent px-3 py-1 text-xs font-black text-accent-foreground uppercase tracking-widest hover:opacity-90"
+              >
                 + Log Trip
               </Link>
             )}
@@ -51,24 +67,16 @@ export default async function DashboardLayout({
           <div className="flex-1" />
 
           {/* Parent: student selector */}
-          {userType === 'parent' && students.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-white/50 text-[10px] uppercase tracking-widest hidden sm:block">
-                Student
-              </span>
-              {/* Static for now — issue #5 will wire up active student selection */}
-              <span className="text-accent text-xs font-bold uppercase tracking-wide">
-                {students.map((s) => s.name).join(', ')}
-              </span>
-            </div>
+          {userType === 'parent' && students.length > 0 && selectedStudent && (
+            <StudentSelector students={students} selectedId={selectedStudent.id} />
           )}
 
-          {/* Student: just show their name */}
+          {/* Student: show their own name */}
           {userType === 'student' && (
             <span className="text-white/70 text-xs uppercase tracking-wide">{name}</span>
           )}
 
-          {/* Logout */}
+          {/* Sign out */}
           <form action={logoutAction}>
             <button
               type="submit"

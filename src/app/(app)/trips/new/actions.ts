@@ -1,15 +1,15 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { trips, users, locationTypes, weatherConditions } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export type TripFormState = {
   success?: true;
   errors?: {
-    studentId?: string;
     tripDate?: string;
     locationType?: string;
     weather?: string;
@@ -29,18 +29,19 @@ export async function createTripAction(
   const { id: sessionId, userType } = session.user;
   const createdBy = Number(sessionId);
 
-  // Determine studentId
+  // Determine studentId from cookie (parents) or self (students)
   let studentId: number;
   if (userType === 'parent') {
-    const raw = formData.get('studentId');
-    if (!raw) return { errors: { studentId: 'Select a student.' } };
-    studentId = Number(raw);
+    const jar = await cookies();
+    const cookieVal = jar.get('selected_student_id')?.value;
+    if (!cookieVal) return { errors: { form: 'No student selected. Use the student selector in the nav.' } };
+    studentId = Number(cookieVal);
     // Verify this student belongs to the logged-in parent
     const [student] = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.id, studentId));
-    if (!student) return { errors: { studentId: 'Invalid student.' } };
+      .where(and(eq(users.id, studentId), eq(users.parentId, createdBy)));
+    if (!student) return { errors: { form: 'Invalid student selection.' } };
   } else {
     studentId = createdBy;
   }

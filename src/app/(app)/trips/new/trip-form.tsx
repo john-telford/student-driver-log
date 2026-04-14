@@ -6,12 +6,12 @@ import { createTripAction, type TripFormState } from './actions';
 import { locationTypes, weatherConditions } from '@/db/schema';
 
 const locationLabels: Record<typeof locationTypes[number], string> = {
-  highway:      'Highway',
-  residential:  'Residential',
-  rural:        'Rural',
-  urban:        'Urban',
-  parking_lot:  'Parking Lot',
-  race_track:   'Race Track',
+  highway:     'Highway',
+  residential: 'Residential',
+  rural:       'Rural',
+  urban:       'Urban',
+  parking_lot: 'Parking Lot',
+  race_track:  'Race Track',
 };
 
 const weatherLabels: Record<typeof weatherConditions[number], string> = {
@@ -22,25 +22,19 @@ const weatherLabels: Record<typeof weatherConditions[number], string> = {
   ice:   'Ice',
 };
 
-import type { UserType } from '@/db/schema';
-
-type Student = { id: number; name: string };
-
 const inputClass =
   'mt-1 block w-full rounded border border-input px-3 py-2 text-sm text-foreground ' +
   'placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary';
 
 const labelClass = 'block text-xs font-bold text-foreground uppercase tracking-wider';
-
 const errorClass = 'mt-1 text-xs text-destructive font-medium';
 
-export default function TripForm({ students, userType }: { students: Student[]; userType: UserType }) {
+export default function TripForm() {
   const [state, action, pending] = useActionState<TripFormState | undefined, FormData>(
     createTripAction,
     undefined
   );
 
-  const isParent = userType === 'parent';
   const today = new Date().toISOString().split('T')[0];
 
   if (state?.success) {
@@ -48,12 +42,8 @@ export default function TripForm({ students, userType }: { students: Student[]; 
       <div className="text-center space-y-6 py-4">
         <div className="space-y-2">
           <p className="text-4xl">✓</p>
-          <h2 className="text-xl font-black uppercase tracking-wide text-foreground">
-            Trip Logged
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            The driving session has been saved.
-          </p>
+          <h2 className="text-xl font-black uppercase tracking-wide text-foreground">Trip Logged</h2>
+          <p className="text-sm text-muted-foreground">The driving session has been saved.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
@@ -62,7 +52,6 @@ export default function TripForm({ students, userType }: { students: Student[]; 
           >
             Go to Dashboard
           </Link>
-          {/* href to same page triggers a full navigation, resetting form state */}
           <a
             href="/trips/new"
             className="rounded border border-border px-6 py-2.5 text-sm font-bold text-foreground uppercase tracking-widest hover:bg-muted text-center"
@@ -76,22 +65,6 @@ export default function TripForm({ students, userType }: { students: Student[]; 
 
   return (
     <form action={action} className="space-y-5">
-      {/* Student selector — parents only */}
-      {isParent && (
-        <div>
-          <label htmlFor="studentId" className={labelClass}>Student</label>
-          <select id="studentId" name="studentId" required className={inputClass}>
-            <option value="">Select a student…</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-          {state?.errors?.studentId && (
-            <p className={errorClass}>{state.errors.studentId}</p>
-          )}
-        </div>
-      )}
-
       {/* Date */}
       <div>
         <label htmlFor="tripDate" className={labelClass}>Date</label>
@@ -104,9 +77,7 @@ export default function TripForm({ students, userType }: { students: Student[]; 
           defaultValue={today}
           className={inputClass}
         />
-        {state?.errors?.tripDate && (
-          <p className={errorClass}>{state.errors.tripDate}</p>
-        )}
+        {state?.errors?.tripDate && <p className={errorClass}>{state.errors.tripDate}</p>}
       </div>
 
       {/* Location type */}
@@ -118,9 +89,7 @@ export default function TripForm({ students, userType }: { students: Student[]; 
             <option key={l} value={l}>{locationLabels[l]}</option>
           ))}
         </select>
-        {state?.errors?.locationType && (
-          <p className={errorClass}>{state.errors.locationType}</p>
-        )}
+        {state?.errors?.locationType && <p className={errorClass}>{state.errors.locationType}</p>}
       </div>
 
       {/* Weather */}
@@ -132,9 +101,7 @@ export default function TripForm({ students, userType }: { students: Student[]; 
             <option key={w} value={w}>{weatherLabels[w]}</option>
           ))}
         </select>
-        {state?.errors?.weather && (
-          <p className={errorClass}>{state.errors.weather}</p>
-        )}
+        {state?.errors?.weather && <p className={errorClass}>{state.errors.weather}</p>}
       </div>
 
       {/* Minutes */}
@@ -164,13 +131,13 @@ export default function TripForm({ students, userType }: { students: Student[]; 
           />
         </div>
       </div>
-      {state?.errors?.minutes && (
-        <p className={errorClass}>{state.errors.minutes}</p>
-      )}
+      {state?.errors?.minutes && <p className={errorClass}>{state.errors.minutes}</p>}
 
       {/* Notes */}
       <div>
-        <label htmlFor="notes" className={labelClass}>Notes <span className="font-normal normal-case text-muted-foreground">(optional)</span></label>
+        <label htmlFor="notes" className={labelClass}>
+          Notes <span className="font-normal normal-case text-muted-foreground">(optional)</span>
+        </label>
         <textarea
           id="notes"
           name="notes"
@@ -179,14 +146,10 @@ export default function TripForm({ students, userType }: { students: Student[]; 
           placeholder="Any notes about the session…"
           className={inputClass + ' resize-none'}
         />
-        {state?.errors?.notes && (
-          <p className={errorClass}>{state.errors.notes}</p>
-        )}
+        {state?.errors?.notes && <p className={errorClass}>{state.errors.notes}</p>}
       </div>
 
-      {state?.errors?.form && (
-        <p className={errorClass}>{state.errors.form}</p>
-      )}
+      {state?.errors?.form && <p className={errorClass}>{state.errors.form}</p>}
 
       <div className="flex gap-3 pt-1">
         <button
