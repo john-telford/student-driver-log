@@ -8,17 +8,14 @@ export default function RegisterPage() {
   const [state, action, pending] = useActionState(registerAction, undefined);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[oklch(0.20_0.04_152)]">
+    <div className="min-h-screen flex items-center justify-center bg-white">
       {/* Outer white border frame — mimics highway sign reflective border */}
-      <div className="p-[6px] bg-white rounded-[3px] shadow-2xl w-full max-w-sm">
+      <div className="p-[6px] bg-white rounded-3xl shadow-lg border-[3px] border-black w-full max-w-sm">
         {/* Inner green sign panel */}
-        <div className="bg-primary rounded-[2px] px-8 py-7 space-y-6">
+        <div className="bg-primary rounded-[1.2rem] px-8 py-7 space-y-6">
 
           {/* Sign header */}
           <div className="text-center space-y-1 border-b-2 border-white/30 pb-5">
-            <p className="text-accent text-[10px] font-bold tracking-[0.25em] uppercase">
-              Illinois SOS
-            </p>
             <h1 className="text-white text-2xl font-black tracking-wide uppercase leading-tight">
               Student Driver Log
             </h1>
@@ -47,7 +44,7 @@ export default function RegisterPage() {
                 type="text"
                 required
                 autoComplete="name"
-                className="w-full rounded-[2px] border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
               {state?.errors?.name && (
                 <p className="mt-1 text-[11px] font-semibold text-accent">{state.errors.name}</p>
@@ -67,7 +64,7 @@ export default function RegisterPage() {
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full rounded-[2px] border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
               {state?.errors?.email && (
                 <p className="mt-1 text-[11px] font-semibold text-accent">{state.errors.email}</p>
@@ -87,7 +84,7 @@ export default function RegisterPage() {
                 type="password"
                 required
                 autoComplete="new-password"
-                className="w-full rounded-[2px] border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full rounded border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
               {state?.errors?.password && (
                 <p className="mt-1 text-[11px] font-semibold text-accent">{state.errors.password}</p>
@@ -101,7 +98,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={pending}
-              className="w-full mt-1 rounded-[2px] bg-accent px-4 py-2.5 text-sm font-black text-accent-foreground uppercase tracking-widest hover:opacity-90 disabled:opacity-50"
+              className="w-full mt-1 rounded bg-accent px-4 py-2.5 text-sm font-black text-accent-foreground uppercase tracking-widest hover:opacity-90 disabled:opacity-50"
             >
               {pending ? 'Creating Account…' : 'Create Account'}
             </button>

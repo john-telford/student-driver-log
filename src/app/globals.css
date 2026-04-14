@@ -48,92 +48,92 @@
 }
 
 :root {
-  /* Interstate green: #006B3C — FHWA standard highway sign green */
-  --primary:            oklch(0.39 0.13 152);
+  /* Interstate green — Pantone 342 / FHWA guide sign standard (~#006B3C) */
+  --primary:            oklch(0.44 0.16 148);
   --primary-foreground: oklch(1 0 0);
 
   /* Highway yellow: #FFCD00 — FHWA warning sign yellow */
   --accent:             oklch(0.88 0.18 89);
   --accent-foreground:  oklch(0.15 0 0);
 
-  /* Page chrome */
-  --background:         oklch(0.97 0.005 152);   /* very light green-white */
-  --foreground:         oklch(0.15 0.01 152);    /* near-black with green tint */
+  /* Page chrome: white background, highway green text */
+  --background:         oklch(1 0 0);
+  --foreground:         oklch(0.38 0.15 148);    /* Interstate green for body text */
 
-  /* Cards and popovers stay white for readability */
+  /* Cards: white panels so green text reads cleanly */
   --card:               oklch(1 0 0);
-  --card-foreground:    oklch(0.15 0.01 152);
+  --card-foreground:    oklch(0.38 0.15 148);
   --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.01 152);
+  --popover-foreground: oklch(0.38 0.15 148);
 
-  /* Secondary: muted dark green */
-  --secondary:            oklch(0.28 0.09 152);
+  /* Secondary: darker highway green for nav/sidebar */
+  --secondary:            oklch(0.32 0.12 148);
   --secondary-foreground: oklch(1 0 0);
 
-  /* Muted: light green-gray for subtle backgrounds */
-  --muted:            oklch(0.94 0.015 152);
-  --muted-foreground: oklch(0.45 0.04 152);
+  /* Muted: light gray */
+  --muted:            oklch(0.88 0.006 148);
+  --muted-foreground: oklch(0.52 0.08 148);
 
   /* Borders and inputs */
-  --border: oklch(0.82 0.025 152);
-  --input:  oklch(0.82 0.025 152);
-  --ring:   oklch(0.39 0.13 152);
+  --border: oklch(0.82 0.02 148);
+  --input:  oklch(0.82 0.02 148);
+  --ring:   oklch(0.44 0.16 148);
 
   /* Destructive: traffic-sign red */
   --destructive: oklch(0.55 0.22 25);
 
-  /* Progress/chart greens — darker shades of Interstate green */
-  --chart-1: oklch(0.39 0.13 152);
-  --chart-2: oklch(0.50 0.14 152);
-  --chart-3: oklch(0.60 0.13 152);
-  --chart-4: oklch(0.70 0.12 152);
-  --chart-5: oklch(0.88 0.18 89);   /* yellow for the last segment */
+  /* Progress/chart greens */
+  --chart-1: oklch(0.44 0.16 148);
+  --chart-2: oklch(0.52 0.16 148);
+  --chart-3: oklch(0.62 0.14 148);
+  --chart-4: oklch(0.72 0.11 148);
+  --chart-5: oklch(0.88 0.18 89);   /* yellow for last segment */
 
-  --radius: 0.25rem;   /* highway signs have sharp corners */
+  --radius: 0.5rem;    /* matches highway sign corner rounding */
 
   /* Sidebar */
-  --sidebar:                  oklch(0.28 0.09 152);
+  --sidebar:                  oklch(0.32 0.12 148);
   --sidebar-foreground:       oklch(1 0 0);
-  --sidebar-primary:          oklch(0.39 0.13 152);
+  --sidebar-primary:          oklch(0.44 0.16 148);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent:           oklch(0.88 0.18 89);
   --sidebar-accent-foreground: oklch(0.15 0 0);
-  --sidebar-border:           oklch(0.32 0.09 152);
-  --sidebar-ring:             oklch(0.39 0.13 152);
+  --sidebar-border:           oklch(0.36 0.12 148);
+  --sidebar-ring:             oklch(0.44 0.16 148);
 }
 
 .dark {
-  --primary:            oklch(0.50 0.14 152);
+  --primary:            oklch(0.50 0.14 148);
   --primary-foreground: oklch(1 0 0);
   --accent:             oklch(0.88 0.18 89);
   --accent-foreground:  oklch(0.15 0 0);
-  --background:         oklch(0.13 0.02 152);
-  --foreground:         oklch(0.95 0.01 152);
-  --card:               oklch(0.18 0.03 152);
-  --card-foreground:    oklch(0.95 0.01 152);
-  --popover:            oklch(0.18 0.03 152);
-  --popover-foreground: oklch(0.95 0.01 152);
-  --secondary:          oklch(0.24 0.07 152);
-  --secondary-foreground: oklch(0.95 0.01 152);
-  --muted:              oklch(0.22 0.05 152);
-  --muted-foreground:   oklch(0.65 0.05 152);
+  --background:         oklch(0.13 0.02 148);
+  --foreground:         oklch(0.95 0.01 148);
+  --card:               oklch(0.18 0.03 148);
+  --card-foreground:    oklch(0.95 0.01 148);
+  --popover:            oklch(0.18 0.03 148);
+  --popover-foreground: oklch(0.95 0.01 148);
+  --secondary:          oklch(0.24 0.07 148);
+  --secondary-foreground: oklch(0.95 0.01 148);
+  --muted:              oklch(0.22 0.05 148);
+  --muted-foreground:   oklch(0.65 0.05 148);
   --border:             oklch(1 0 0 / 12%);
   --input:              oklch(1 0 0 / 15%);
-  --ring:               oklch(0.50 0.14 152);
+  --ring:               oklch(0.50 0.14 148);
   --destructive:        oklch(0.65 0.22 25);
-  --chart-1: oklch(0.50 0.14 152);
-  --chart-2: oklch(0.60 0.13 152);
-  --chart-3: oklch(0.70 0.12 152);
-  --chart-4: oklch(0.80 0.10 152);
+  --chart-1: oklch(0.50 0.14 148);
+  --chart-2: oklch(0.60 0.13 148);
+  --chart-3: oklch(0.70 0.12 148);
+  --chart-4: oklch(0.80 0.10 148);
   --chart-5: oklch(0.88 0.18 89);
-  --sidebar:                  oklch(0.18 0.03 152);
-  --sidebar-foreground:       oklch(0.95 0.01 152);
-  --sidebar-primary:          oklch(0.50 0.14 152);
+  --sidebar:                  oklch(0.18 0.03 148);
+  --sidebar-foreground:       oklch(0.95 0.01 148);
+  --sidebar-primary:          oklch(0.50 0.14 148);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent:           oklch(0.88 0.18 89);
   --sidebar-accent-foreground: oklch(0.15 0 0);
   --sidebar-border:           oklch(1 0 0 / 12%);
-  --sidebar-ring:             oklch(0.50 0.14 152);
+  --sidebar-ring:             oklch(0.50 0.14 148);
 }
 
 @layer base {
@@ -141,7 +141,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-foreground;
   }
   html {
     @apply font-sans;
@@ -152,23 +152,23 @@
 .sign-card {
   padding: 6px;
   background: white;
-  border-radius: 3px;
-  box-shadow: 0 20px 60px oklch(0 0 0 / 60%);
+  border-radius: calc(var(--radius) + 4px);   /* slightly larger than panel */
+  box-shadow: 0 8px 32px oklch(0.36 0.12 152 / 25%);
 }
 
 .sign-card-panel {
-  background-color: oklch(0.39 0.13 152);
-  border-radius: 2px;
+  background-color: oklch(0.44 0.16 148);
+  border-radius: var(--radius);
   color: white;
 }
 
 /* Highway sign utility — standalone green panel badge */
 .sign-panel {
-  background-color: oklch(0.39 0.13 152);
+  background-color: oklch(0.44 0.16 148);
   color: white;
   font-weight: 700;
   letter-spacing: 0.04em;
-  border: 3px solid oklch(0.60 0.08 152);
+  border: 3px solid oklch(0.60 0.08 148);
   border-radius: 4px;
   padding: 0.5rem 1.25rem;
   text-transform: uppercase;
