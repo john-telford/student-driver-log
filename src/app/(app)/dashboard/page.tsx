@@ -4,7 +4,6 @@ import { users, trips, type UserType } from '@/db/schema';
 import { eq, and, desc, sum } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import AddStudentForm from './add-student-form';
 
 // Illinois learner permit requirements
 const TOTAL_REQUIRED_MIN = 50 * 60;   // 3000 min
@@ -111,10 +110,18 @@ export default async function DashboardPage() {
         <p className="text-sm text-muted-foreground mt-1">Welcome back, {name}.</p>
       </div>
 
-      {/* Parent: student management */}
+      {/* Parent: student list */}
       {userType === 'parent' && (
         <div className="rounded border border-border bg-card p-6 space-y-4">
-          <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Students</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Students</h2>
+            <Link
+              href="/students/new"
+              className="text-xs font-bold text-primary uppercase tracking-widest hover:underline"
+            >
+              + Add a Student
+            </Link>
+          </div>
           {students.length > 0 ? (
             <ul className="space-y-1">
               {students.map((s) => (
@@ -126,15 +133,12 @@ export default async function DashboardPage() {
             </ul>
           ) : (
             <p className="text-sm text-muted-foreground">
-              No students yet. Add one below to start logging trips.
+              No students yet.{' '}
+              <Link href="/students/new" className="font-semibold text-primary hover:underline">
+                Add one to get started.
+              </Link>
             </p>
           )}
-          <div className="border-t border-border pt-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-              Add a Student
-            </p>
-            <AddStudentForm />
-          </div>
         </div>
       )}
 

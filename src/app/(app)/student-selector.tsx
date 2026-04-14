@@ -17,7 +17,12 @@ export default function StudentSelector({
   const router = useRouter();
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const id = Number(e.target.value);
+    const val = e.target.value;
+    if (val === 'new') {
+      router.push('/students/new');
+      return;
+    }
+    const id = Number(val);
     startTransition(async () => {
       await selectStudentAction(id);
       router.refresh();
@@ -40,6 +45,9 @@ export default function StudentSelector({
             {s.name}
           </option>
         ))}
+        <option value="new" className="text-primary bg-white normal-case font-semibold">
+          + Add a Student
+        </option>
       </select>
     </div>
   );
