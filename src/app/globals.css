@@ -8,8 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-mono: var(--font-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,72 +48,92 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Interstate green: #006B3C — FHWA standard highway sign green */
+  --primary:            oklch(0.39 0.13 152);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Highway yellow: #FFCD00 — FHWA warning sign yellow */
+  --accent:             oklch(0.88 0.18 89);
+  --accent-foreground:  oklch(0.15 0 0);
+
+  /* Page chrome */
+  --background:         oklch(0.97 0.005 152);   /* very light green-white */
+  --foreground:         oklch(0.15 0.01 152);    /* near-black with green tint */
+
+  /* Cards and popovers stay white for readability */
+  --card:               oklch(1 0 0);
+  --card-foreground:    oklch(0.15 0.01 152);
+  --popover:            oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 152);
+
+  /* Secondary: muted dark green */
+  --secondary:            oklch(0.28 0.09 152);
+  --secondary-foreground: oklch(1 0 0);
+
+  /* Muted: light green-gray for subtle backgrounds */
+  --muted:            oklch(0.94 0.015 152);
+  --muted-foreground: oklch(0.45 0.04 152);
+
+  /* Borders and inputs */
+  --border: oklch(0.82 0.025 152);
+  --input:  oklch(0.82 0.025 152);
+  --ring:   oklch(0.39 0.13 152);
+
+  /* Destructive: traffic-sign red */
+  --destructive: oklch(0.55 0.22 25);
+
+  /* Progress/chart greens — darker shades of Interstate green */
+  --chart-1: oklch(0.39 0.13 152);
+  --chart-2: oklch(0.50 0.14 152);
+  --chart-3: oklch(0.60 0.13 152);
+  --chart-4: oklch(0.70 0.12 152);
+  --chart-5: oklch(0.88 0.18 89);   /* yellow for the last segment */
+
+  --radius: 0.25rem;   /* highway signs have sharp corners */
+
+  /* Sidebar */
+  --sidebar:                  oklch(0.28 0.09 152);
+  --sidebar-foreground:       oklch(1 0 0);
+  --sidebar-primary:          oklch(0.39 0.13 152);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent:           oklch(0.88 0.18 89);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border:           oklch(0.32 0.09 152);
+  --sidebar-ring:             oklch(0.39 0.13 152);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --primary:            oklch(0.50 0.14 152);
+  --primary-foreground: oklch(1 0 0);
+  --accent:             oklch(0.88 0.18 89);
+  --accent-foreground:  oklch(0.15 0 0);
+  --background:         oklch(0.13 0.02 152);
+  --foreground:         oklch(0.95 0.01 152);
+  --card:               oklch(0.18 0.03 152);
+  --card-foreground:    oklch(0.95 0.01 152);
+  --popover:            oklch(0.18 0.03 152);
+  --popover-foreground: oklch(0.95 0.01 152);
+  --secondary:          oklch(0.24 0.07 152);
+  --secondary-foreground: oklch(0.95 0.01 152);
+  --muted:              oklch(0.22 0.05 152);
+  --muted-foreground:   oklch(0.65 0.05 152);
+  --border:             oklch(1 0 0 / 12%);
+  --input:              oklch(1 0 0 / 15%);
+  --ring:               oklch(0.50 0.14 152);
+  --destructive:        oklch(0.65 0.22 25);
+  --chart-1: oklch(0.50 0.14 152);
+  --chart-2: oklch(0.60 0.13 152);
+  --chart-3: oklch(0.70 0.12 152);
+  --chart-4: oklch(0.80 0.10 152);
+  --chart-5: oklch(0.88 0.18 89);
+  --sidebar:                  oklch(0.18 0.03 152);
+  --sidebar-foreground:       oklch(0.95 0.01 152);
+  --sidebar-primary:          oklch(0.50 0.14 152);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent:           oklch(0.88 0.18 89);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border:           oklch(1 0 0 / 12%);
+  --sidebar-ring:             oklch(0.50 0.14 152);
 }
 
 @layer base {
@@ -127,4 +146,30 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Highway sign card — white reflective border frame wrapping a green panel */
+.sign-card {
+  padding: 6px;
+  background: white;
+  border-radius: 3px;
+  box-shadow: 0 20px 60px oklch(0 0 0 / 60%);
+}
+
+.sign-card-panel {
+  background-color: oklch(0.39 0.13 152);
+  border-radius: 2px;
+  color: white;
+}
+
+/* Highway sign utility — standalone green panel badge */
+.sign-panel {
+  background-color: oklch(0.39 0.13 152);
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 3px solid oklch(0.60 0.08 152);
+  border-radius: 4px;
+  padding: 0.5rem 1.25rem;
+  text-transform: uppercase;
 }
