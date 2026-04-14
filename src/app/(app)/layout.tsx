@@ -5,8 +5,7 @@ import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { logoutAction } from './dashboard/actions';
-import StudentSelector from './student-selector';
+import AppNav from './app-nav';
 
 export default async function AppLayout({
   children,
@@ -36,52 +35,21 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="bg-primary border-b-4 border-accent">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Row 1: app name + sign out */}
-          <div className="h-11 flex items-center justify-between">
-            <Link
-              href="/dashboard"
-              className="text-white font-black text-sm uppercase tracking-widest hover:opacity-80"
-            >
-              Student Driver Log
-            </Link>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className="text-[10px] font-bold text-accent uppercase tracking-widest hover:opacity-80"
-              >
-                Sign Out
-              </button>
-            </form>
-          </div>
-
-          {/* Row 2: nav actions + student context */}
-          <div className="pb-2.5 flex items-center gap-3">
-            <Link
-              href="/trips"
-              className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white"
-            >
-              Trips
-            </Link>
-            {canLogTrip && (
-              <Link
-                href="/trips/new"
-                className="rounded bg-accent px-3 py-1 text-xs font-black text-accent-foreground uppercase tracking-widest hover:opacity-90"
-              >
-                + Log Trip
-              </Link>
-            )}
-
-            <div className="flex-1" />
-
-            {userType === 'parent' && students.length > 0 && selectedStudent && (
-              <StudentSelector students={students} selectedId={selectedStudent.id} />
-            )}
-            {userType === 'student' && (
-              <span className="text-white/70 text-xs uppercase tracking-wide">{name}</span>
-            )}
-          </div>
+      <header className="bg-primary border-b-4 border-accent relative">
+        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="text-white font-black text-sm uppercase tracking-widest shrink-0 hover:opacity-80"
+          >
+            Student Driver Log
+          </Link>
+          <AppNav
+            userType={userType ?? ''}
+            userName={name ?? ''}
+            students={students}
+            selectedStudent={selectedStudent}
+            canLogTrip={canLogTrip}
+          />
         </div>
       </header>
 
