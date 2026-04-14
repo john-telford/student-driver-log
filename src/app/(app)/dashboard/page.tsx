@@ -1,15 +1,25 @@
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users, trips, type UserType } from '@/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sum } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import AddStudentForm from './add-student-form';
+
+// Illinois learner permit requirements
+const TOTAL_REQUIRED_MIN = 50 * 60;   // 3000 min
+const NIGHT_REQUIRED_MIN = 10 * 60;   // 600 min
 
 const locationLabels: Record<string, string> = {
   highway: 'Highway', residential: 'Residential', rural: 'Rural',
   urban: 'Urban', parking_lot: 'Parking Lot', race_track: 'Race Track',
 };
+
+function formatHMM(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}:${String(m).padStart(2, '0')}`;
+}
 
 function formatMinutes(min: number): string {
   if (min === 0) return '—';
@@ -18,6 +28,16 @@ function formatMinutes(min: number): string {
   if (h === 0) return `${m}m`;
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
+}
+
+function remainingHours(current: number, required: number): string {
+  const rem = Math.max(0, required - current);
+  const h = Math.floor(rem / 60);
+  const m = rem % 60;
+  if (rem === 0) return 'Complete';
+  if (h === 0) return `${m}m left`;
+  if (m === 0) return `${h}h left`;
+  return `${h}h ${m}m left`;
 }
 
 export default async function DashboardPage() {
@@ -34,28 +54,52 @@ export default async function DashboardPage() {
       .where(eq(users.parentId, userId));
   }
 
-  // Resolve student for recent trips
-  let recentStudentId: number | null = null;
+  // Resolve selected student (cookie for parents, self for students)
+  let selectedStudentId: number | null = null;
+  let selectedStudentName: string | null = null;
   if (userType === 'parent') {
     const jar = await cookies();
     const cookieVal = jar.get('selected_student_id')?.value;
     if (cookieVal) {
       const studentId = Number(cookieVal);
       const [student] = await db
-        .select({ id: users.id })
+        .select({ id: users.id, name: users.name })
         .from(users)
         .where(and(eq(users.id, studentId), eq(users.parentId, userId)));
-      if (student) recentStudentId = studentId;
+      if (student) {
+        selectedStudentId = studentId;
+        selectedStudentName = student.name;
+      }
     }
   } else {
-    recentStudentId = userId;
+    selectedStudentId = userId;
   }
 
-  const recentTrips = recentStudentId
+  // Aggregate totals
+  let totalDaytime = 0;
+  let totalNighttime = 0;
+  if (selectedStudentId) {
+    const [totals] = await db
+      .select({
+        daytime: sum(trips.daytimeMinutes),
+        nighttime: sum(trips.nighttimeMinutes),
+      })
+      .from(trips)
+      .where(eq(trips.studentId, selectedStudentId));
+    totalDaytime = Number(totals?.daytime ?? 0);
+    totalNighttime = Number(totals?.nighttime ?? 0);
+  }
+  const grandTotal = totalDaytime + totalNighttime;
+
+  const totalPct = Math.min(100, Math.round((grandTotal / TOTAL_REQUIRED_MIN) * 100));
+  const nightPct = Math.min(100, Math.round((totalNighttime / NIGHT_REQUIRED_MIN) * 100));
+
+  // Recent trips (last 5)
+  const recentTrips = selectedStudentId
     ? await db
         .select()
         .from(trips)
-        .where(eq(trips.studentId, recentStudentId))
+        .where(eq(trips.studentId, selectedStudentId))
         .orderBy(desc(trips.tripDate), desc(trips.id))
         .limit(5)
     : [];
@@ -63,19 +107,14 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-black uppercase tracking-wide text-foreground">
-          Dashboard
-        </h1>
+        <h1 className="text-xl font-black uppercase tracking-wide text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">Welcome back, {name}.</p>
       </div>
 
       {/* Parent: student management */}
       {userType === 'parent' && (
         <div className="rounded border border-border bg-card p-6 space-y-4">
-          <h2 className="text-sm font-black uppercase tracking-wide text-foreground">
-            Students
-          </h2>
-
+          <h2 className="text-sm font-black uppercase tracking-wide text-foreground">Students</h2>
           {students.length > 0 ? (
             <ul className="space-y-1">
               {students.map((s) => (
@@ -90,7 +129,6 @@ export default async function DashboardPage() {
               No students yet. Add one below to start logging trips.
             </p>
           )}
-
           <div className="border-t border-border pt-4">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
               Add a Student
@@ -100,10 +138,62 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Progress summary — built in issue #7 */}
-      <div className="rounded border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-        Hour totals and progress bar coming in issue #7.
-      </div>
+      {/* Hour totals + progress */}
+      {selectedStudentId ? (
+        <div className="rounded border border-border bg-card p-6 space-y-6">
+          <h2 className="text-sm font-black uppercase tracking-wide text-foreground">
+            Progress{selectedStudentName ? ` — ${selectedStudentName}` : ''}
+          </h2>
+
+          {/* Stat row */}
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: 'Daytime', value: formatHMM(totalDaytime) },
+              { label: 'Nighttime', value: formatHMM(totalNighttime) },
+              { label: 'Total', value: formatHMM(grandTotal) },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded border border-border p-4 text-center">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+                <p className="mt-1 text-2xl font-black tabular-nums text-foreground">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* 50-hour progress */}
+          <div className="space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-foreground">50-Hour Requirement</p>
+              <p className="text-xs text-muted-foreground">{remainingHours(grandTotal, TOTAL_REQUIRED_MIN)}</p>
+            </div>
+            <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${totalPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-right">{totalPct}% of 50:00</p>
+          </div>
+
+          {/* 10-hour night progress */}
+          <div className="space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-foreground">10-Hour Night Requirement</p>
+              <p className="text-xs text-muted-foreground">{remainingHours(totalNighttime, NIGHT_REQUIRED_MIN)}</p>
+            </div>
+            <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-accent transition-all"
+                style={{ width: `${nightPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-right">{nightPct}% of 10:00</p>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+          Select a student to view progress.
+        </div>
+      )}
 
       {/* Recent trips */}
       <div className="rounded border border-border bg-card overflow-hidden">
