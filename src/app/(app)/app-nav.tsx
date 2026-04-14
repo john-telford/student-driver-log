@@ -81,7 +81,7 @@ export default function AppNav({
         type="button"
         className="sm:hidden ml-auto text-white p-3 -mr-3 touch-manipulation cursor-pointer"
         onClick={() => setOpen((o) => !o)}
-        onTouchStart={() => setOpen((o) => !o)}
+        onTouchStart={(e) => { e.preventDefault(); setOpen((o) => !o); }}
         aria-label={open ? 'Close menu' : 'Open menu'}
       >
         {open ? (
