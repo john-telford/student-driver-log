@@ -25,6 +25,9 @@ export default function AppNav({
         <Link href="/trips" className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white">
           Trips
         </Link>
+        <Link href="/report" className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white">
+          Report
+        </Link>
         {canLogTrip && (
           <Link href="/trips/new" className="rounded bg-accent px-3 py-1 text-xs font-black text-accent-foreground uppercase tracking-widest hover:opacity-90">
             + Log Trip
@@ -64,6 +67,9 @@ export default function AppNav({
           <div className="px-4 py-4 flex flex-col gap-4">
             <Link href="/trips" className="text-white text-sm font-bold uppercase tracking-widest">
               Trips
+            </Link>
+            <Link href="/report" className="text-white text-sm font-bold uppercase tracking-widest">
+              Report
             </Link>
             {canLogTrip && (
               <Link href="/trips/new" className="self-start rounded bg-accent px-4 py-2 text-sm font-black text-accent-foreground uppercase tracking-widest">

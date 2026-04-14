@@ -130,6 +130,19 @@
   color: white;
 }
 
+@media print {
+  /* Hide everything except the report content */
+  header, .print\:hidden { display: none !important; }
+
+  body { background: white; color: black; }
+
+  /* Ensure table borders print in Chrome/Safari */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Full width, no padding */
+  main { padding: 0 !important; max-width: 100% !important; }
+}
+
 /* Highway sign utility — standalone green panel badge */
 .sign-panel {
   background-color: oklch(0.44 0.16 148);
