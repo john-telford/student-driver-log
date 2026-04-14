@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Overpass, Overpass_Mono } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
 
 // Overpass is the open-source recreation of Highway Gothic (FHWA Series E Modified)
 const overpass = Overpass({
@@ -30,8 +31,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn('h-full antialiased', overpass.variable, overpassMono.variable)}
+      style={{ colorScheme: 'light' }}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster richColors position="top-right" />
+      </body>
     </html>
   );
 }

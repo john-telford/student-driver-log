@@ -3,7 +3,8 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
-import { logoutAction } from './actions';
+import Link from 'next/link';
+import { logoutAction } from './dashboard/actions';
 
 export default async function DashboardLayout({
   children,
@@ -30,9 +31,22 @@ export default async function DashboardLayout({
       <header className="bg-primary border-b-4 border-accent">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-4">
           {/* App name */}
-          <span className="text-white font-black text-sm uppercase tracking-widest shrink-0">
+          <Link href="/dashboard" className="text-white font-black text-sm uppercase tracking-widest shrink-0 hover:opacity-80">
             Student Driver Log
-          </span>
+          </Link>
+
+          {/* Nav links */}
+          <nav className="flex items-center gap-4 ml-4">
+            <Link href="/trips" className="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white">
+              Trips
+            </Link>
+            {/* Only show Log Trip when a parent has students, or always for students */}
+            {(userType === 'student' || (userType === 'parent' && students.length > 0)) && (
+              <Link href="/trips/new" className="rounded bg-accent px-3 py-1 text-xs font-black text-accent-foreground uppercase tracking-widest hover:opacity-90">
+                + Log Trip
+              </Link>
+            )}
+          </nav>
 
           <div className="flex-1" />
 
