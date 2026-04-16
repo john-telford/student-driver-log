@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export async function selectStudentAction(studentId: number) {
   const jar = await cookies();
@@ -26,11 +26,12 @@ export async function resolveSelectedStudentId(parentId: number): Promise<number
 
   if (val) {
     const studentId = Number(val);
+    // Verify the student exists AND belongs to this parent — prevents stale
+    // cookies from a previous login leaking another parent's student data
     const [student] = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.id, studentId));
-    // Only trust the cookie value if the student actually exists
+      .where(and(eq(users.id, studentId), eq(users.parentId, parentId)));
     if (student) return studentId;
   }
 
