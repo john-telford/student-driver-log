@@ -4,7 +4,7 @@ import { trips, users, type UserType } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { resolveSelectedStudentId } from '../actions';
-import PrintButton from './print-button';
+import ReportActions from './print-button';
 
 const locationLabels: Record<string, string> = {
   highway:     'Highway',
@@ -92,7 +92,7 @@ export default async function ReportPage() {
             <p className="text-sm text-muted-foreground mt-0.5">{studentName}</p>
           )}
         </div>
-        <PrintButton />
+        <ReportActions />
       </div>
 
       {/* Report — styled for both screen and print */}
