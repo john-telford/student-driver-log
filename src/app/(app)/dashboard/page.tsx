@@ -132,11 +132,16 @@ export default async function DashboardPage() {
               <p className="text-xs font-bold uppercase tracking-wider text-foreground">50-Hour Requirement</p>
               <p className="text-xs text-muted-foreground">{remainingHours(grandTotal, TOTAL_REQUIRED_MIN)}</p>
             </div>
-            <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{ width: `${totalPct}%` }}
-              />
+            <div className="relative group">
+              <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${totalPct}%` }}
+                />
+              </div>
+              <div className="pointer-events-none absolute left-0 -top-8 hidden group-hover:block rounded bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md whitespace-nowrap">
+                {formatHMM(grandTotal)} total ({formatHMM(totalDaytime)} day + {formatHMM(totalNighttime)} night)
+              </div>
             </div>
             <p className="text-xs text-muted-foreground text-right">{totalPct}% of 50:00</p>
           </div>
@@ -147,11 +152,16 @@ export default async function DashboardPage() {
               <p className="text-xs font-bold uppercase tracking-wider text-foreground">10-Hour Night Requirement</p>
               <p className="text-xs text-muted-foreground">{remainingHours(totalNighttime, NIGHT_REQUIRED_MIN)}</p>
             </div>
-            <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full bg-accent transition-all"
-                style={{ width: `${nightPct}%` }}
-              />
+            <div className="relative group">
+              <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-accent transition-all"
+                  style={{ width: `${nightPct}%` }}
+                />
+              </div>
+              <div className="pointer-events-none absolute left-0 -top-8 hidden group-hover:block rounded bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md whitespace-nowrap">
+                {formatHMM(totalNighttime)} nighttime
+              </div>
             </div>
             <p className="text-xs text-muted-foreground text-right">{nightPct}% of 10:00</p>
           </div>
