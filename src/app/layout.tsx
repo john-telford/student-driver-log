@@ -20,6 +20,11 @@ const overpassMono = Overpass_Mono({
 export const metadata: Metadata = {
   title: 'Student Driver Log',
   description: "Illinois learner's permit hour tracker",
+  appleWebApp: {
+    capable: true,
+    title: 'Student Driver Log',
+    statusBarStyle: 'default',
+  },
 };
 
 export default function RootLayout({
