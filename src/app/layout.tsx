@@ -19,8 +19,20 @@ const overpassMono = Overpass_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ??
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  ),
   title: 'Student Driver Log',
-  description: "Illinois learner's permit hour tracker",
+  description: 'Track Illinois learner\'s permit practice hours. Free tool for families.',
+  openGraph: {
+    title: 'Student Driver Log',
+    description: 'Track Illinois learner\'s permit practice hours. Free tool for families.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
   appleWebApp: {
     capable: true,
     title: 'Student Driver Log',
