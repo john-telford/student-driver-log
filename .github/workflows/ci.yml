@@ -27,8 +27,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Suppress Auth.js warning about missing AUTH_SECRET at build time
+          # Placeholder values so the libSQL client and Auth.js initialize
+          # without errors during Next.js page data collection at build time.
           AUTH_SECRET: ci-build-placeholder
+          DATABASE_URL: file:./ci-build.db
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
