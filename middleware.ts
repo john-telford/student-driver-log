@@ -13,6 +13,6 @@ export const config = {
      * - favicon.ico
      * - /login, /register (public auth pages)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|apple-icon|login|register).*)',
+    '/((?!api/auth|_next/static|_next/image|favicon.ico|icon|apple-icon|login|register).*)',
   ],
 };
