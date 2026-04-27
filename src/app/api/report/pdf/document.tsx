@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { Trip } from '@/db/schema';
+import { formatHMM } from '@/lib/utils';
 
 const locationLabels: Record<string, string> = {
   highway: 'Highway', residential: 'Residential', rural: 'Rural',
@@ -8,12 +9,6 @@ const locationLabels: Record<string, string> = {
 const weatherLabels: Record<string, string> = {
   clear: 'Clear', rain: 'Rain', snow: 'Snow', fog: 'Fog', ice: 'Ice',
 };
-
-function formatHMM(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h}:${String(m).padStart(2, '0')}`;
-}
 
 // Pantone 342 in hex for PDF
 const GREEN = '#1a5c2e';

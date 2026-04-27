@@ -4,6 +4,7 @@ import { users, trips, type UserType } from '@/db/schema';
 import { eq, and, desc, sum } from 'drizzle-orm';
 import Link from 'next/link';
 import { resolveSelectedStudentId } from '../actions';
+import { formatHMM } from '@/lib/utils';
 
 // Illinois learner permit requirements
 const TOTAL_REQUIRED_MIN = 50 * 60;   // 3000 min
@@ -13,12 +14,6 @@ const locationLabels: Record<string, string> = {
   highway: 'Highway', residential: 'Residential', rural: 'Rural',
   urban: 'Urban', parking_lot: 'Parking Lot', race_track: 'Race Track',
 };
-
-function formatHMM(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h}:${String(m).padStart(2, '0')}`;
-}
 
 function formatMinutes(min: number): string {
   if (min === 0) return '—';
