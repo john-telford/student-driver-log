@@ -21,8 +21,11 @@ export default defineConfig({
   globalTeardown: './tests/e2e/global-teardown.ts',
   webServer: {
     // Port 3001 avoids conflict with the dev server on 3000.
-    // next build is required before running tests locally (CI does it automatically).
-    command: 'npm run build && npm start -- -p 3001',
+    // In CI the build is a dedicated prior step; skip rebuilding here.
+    // Locally: run `npm run build` before `npm run test:e2e`.
+    command: process.env.CI
+      ? 'npm start -- -p 3001'
+      : 'npm run build && npm start -- -p 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
