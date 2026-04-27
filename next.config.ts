@@ -1,11 +1,8 @@
 import type { NextConfig } from 'next';
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf-8'));
+const pkg = JSON.parse(readFileSync('package.json', 'utf-8'));
 
 function getGitSha(): string {
   if (process.env.VERCEL_GIT_COMMIT_SHA) {
