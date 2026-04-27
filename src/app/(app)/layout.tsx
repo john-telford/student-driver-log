@@ -56,6 +56,16 @@ export default async function AppLayout({
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
         {children}
       </main>
+
+      {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
+        <footer className="py-3 text-center">
+          <span className="text-xs text-black/30 font-mono">
+            {process.env.NEXT_PUBLIC_APP_VERSION && `v${process.env.NEXT_PUBLIC_APP_VERSION}`}
+            {process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_GIT_SHA && ' · '}
+            {process.env.NEXT_PUBLIC_GIT_SHA && process.env.NEXT_PUBLIC_GIT_SHA.slice(0, 7)}
+          </span>
+        </footer>
+      )}
     </div>
   );
 }
