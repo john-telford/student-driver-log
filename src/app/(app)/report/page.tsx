@@ -5,6 +5,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { resolveSelectedStudentId } from '../actions';
 import ReportActions from './print-button';
+import { formatHMM } from '@/lib/utils';
 
 const locationLabels: Record<string, string> = {
   highway:     'Highway',
@@ -22,12 +23,6 @@ const weatherLabels: Record<string, string> = {
   fog:   'Fog',
   ice:   'Ice',
 };
-
-function formatHMM(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h}:${String(m).padStart(2, '0')}`;
-}
 
 export default async function ReportPage() {
   const session = await auth();
