@@ -57,15 +57,23 @@ export default async function AppLayout({
         {children}
       </main>
 
-      {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
-        <footer className="py-3 text-center">
-          <span className="text-xs text-black/30 font-mono">
-            {process.env.NEXT_PUBLIC_APP_VERSION && `v${process.env.NEXT_PUBLIC_APP_VERSION}`}
-            {process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_GIT_SHA && ' · '}
-            {process.env.NEXT_PUBLIC_GIT_SHA && process.env.NEXT_PUBLIC_GIT_SHA.slice(0, 7)}
-          </span>
-        </footer>
-      )}
+      <footer className="border-t border-black/10 py-4 mt-4">
+        <div className="max-w-4xl mx-auto px-4 flex flex-wrap items-center gap-4">
+          <div className="flex gap-4 text-[10px] text-black/40 uppercase tracking-widest">
+            <Link href="/about" className="hover:text-black/70">About</Link>
+            <Link href="/privacy" className="hover:text-black/70">Privacy</Link>
+            <Link href="/terms" className="hover:text-black/70">Terms</Link>
+            <Link href="/faq" className="hover:text-black/70">FAQ</Link>
+          </div>
+          {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
+            <span className="ml-auto text-xs text-black/30 font-mono">
+              {process.env.NEXT_PUBLIC_APP_VERSION && `v${process.env.NEXT_PUBLIC_APP_VERSION}`}
+              {process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_GIT_SHA && ' · '}
+              {process.env.NEXT_PUBLIC_GIT_SHA && process.env.NEXT_PUBLIC_GIT_SHA.slice(0, 7)}
+            </span>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }

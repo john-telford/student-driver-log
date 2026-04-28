@@ -119,12 +119,20 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <p className="text-center text-[10px] text-white/50 uppercase tracking-widest border-t border-white/20 pt-4">
-            Need an account?{' '}
-            <Link href="/register" className="text-accent font-bold hover:opacity-80">
-              Register
-            </Link>
-          </p>
+          <div className="space-y-3 border-t border-white/20 pt-4">
+            <p className="text-center text-[10px] text-white/50 uppercase tracking-widest">
+              Need an account?{' '}
+              <Link href="/register" className="text-accent font-bold hover:opacity-80">
+                Register
+              </Link>
+            </p>
+            <div className="flex justify-center gap-4 text-[10px] text-white/30 uppercase tracking-widest">
+              <Link href="/about" className="hover:text-white/60">About</Link>
+              <Link href="/privacy" className="hover:text-white/60">Privacy</Link>
+              <Link href="/terms" className="hover:text-white/60">Terms</Link>
+              <Link href="/faq" className="hover:text-white/60">FAQ</Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
