@@ -105,12 +105,21 @@ export default function RegisterPage() {
           </form>
 
           {/* Footer */}
-          <p className="text-center text-[10px] text-white/50 uppercase tracking-widest border-t border-white/20 pt-4">
-            Already have an account?{' '}
-            <Link href="/login" className="text-accent font-bold hover:opacity-80">
-              Sign In
-            </Link>
-          </p>
+          <div className="space-y-3 border-t border-white/20 pt-4">
+            <p className="text-center text-[10px] text-white/50 uppercase tracking-widest">
+              Already have an account?{' '}
+              <Link href="/login" className="text-accent font-bold hover:opacity-80">
+                Sign In
+              </Link>
+            </p>
+            {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
+              <p className="text-center text-[10px] text-white/20 font-mono">
+                {process.env.NEXT_PUBLIC_APP_VERSION && `v${process.env.NEXT_PUBLIC_APP_VERSION}`}
+                {process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_GIT_SHA && ' · '}
+                {process.env.NEXT_PUBLIC_GIT_SHA && process.env.NEXT_PUBLIC_GIT_SHA.slice(0, 7)}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
