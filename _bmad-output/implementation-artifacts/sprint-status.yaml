@@ -1,0 +1,94 @@
+# generated: 2026-04-30
+# last_updated: 2026-04-30
+# project: student-driver-log
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-04-30
+last_updated: 2026-04-30  # epic-1 in-progress; story 1.1 ready-for-dev
+project: student-driver-log
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: State Configuration Foundation
+  epic-1: in-progress
+  1-1-create-state-config-type-system-and-foundation-files: ready-for-dev
+  1-2-populate-core-state-configurations: backlog
+  1-3-populate-all-remaining-state-configurations: backlog
+  1-4-extend-users-table-for-state-awareness: backlog
+  1-5-extend-trips-table-for-state-specific-fields: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: State-Aware Registration & Onboarding
+  epic-2: backlog
+  2-1-state-confirmation-gate-for-existing-users: backlog
+  2-2-state-aware-registration-flow: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: State-Aware Trip Logging
+  epic-3: backlog
+  3-1-state-specific-trip-validation-engine: backlog
+  3-2-state-aware-trip-entry-form: backlog
+  3-3-trips-list-conditional-columns-filtering-and-csv-export: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: State-Aware Progress Dashboard
+  epic-4: backlog
+  4-1-dynamic-progress-bars-and-completion-checklist: backlog
+  4-2-hold-period-tracker-and-state-info-card: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: State-Specific Report & PDF Export
+  epic-5: backlog
+  5-1-dynamic-html-report-renderer: backlog
+  5-2-dynamic-pdf-export: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Account Settings & State Management
+  epic-6: backlog
+  6-1-account-settings-and-state-change: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Public State Information Pages
+  epic-7: backlog
+  7-1-public-state-information-pages: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Quality Assurance & Launch Readiness
+  epic-8: backlog
+  8-1-validatetrip-unit-tests: backlog
+  8-2-colorado-full-flow-end-to-end-test: backlog
+  8-3-final-tier-1-spot-check-and-launch-sign-off: backlog
+  epic-8-retrospective: optional
