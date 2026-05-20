@@ -45,50 +45,50 @@ development_status:
   # Epic 1: State Configuration Foundation
   epic-1: in-progress
   1-1-create-state-config-type-system-and-foundation-files: ready-for-dev
-  1-2-populate-core-state-configurations: backlog
-  1-3-populate-all-remaining-state-configurations: backlog
-  1-4-extend-users-table-for-state-awareness: backlog
-  1-5-extend-trips-table-for-state-specific-fields: backlog
+  1-2-populate-core-state-configurations: ready-for-dev
+  1-3-populate-all-remaining-state-configurations: ready-for-dev
+  1-4-extend-users-table-for-state-awareness: ready-for-dev
+  1-5-extend-trips-table-for-state-specific-fields: ready-for-dev
   epic-1-retrospective: optional
 
   # Epic 2: State-Aware Registration & Onboarding
-  epic-2: backlog
-  2-1-state-confirmation-gate-for-existing-users: backlog
-  2-2-state-aware-registration-flow: backlog
+  epic-2: in-progress
+  2-1-state-confirmation-gate-for-existing-users: ready-for-dev
+  2-2-state-aware-registration-flow: ready-for-dev
   epic-2-retrospective: optional
 
   # Epic 3: State-Aware Trip Logging
-  epic-3: backlog
-  3-1-state-specific-trip-validation-engine: backlog
-  3-2-state-aware-trip-entry-form: backlog
-  3-3-trips-list-conditional-columns-filtering-and-csv-export: backlog
+  epic-3: in-progress
+  3-1-state-specific-trip-validation-engine: ready-for-dev
+  3-2-state-aware-trip-entry-form: ready-for-dev
+  3-3-trips-list-conditional-columns-filtering-and-csv-export: ready-for-dev
   epic-3-retrospective: optional
 
   # Epic 4: State-Aware Progress Dashboard
-  epic-4: backlog
-  4-1-dynamic-progress-bars-and-completion-checklist: backlog
-  4-2-hold-period-tracker-and-state-info-card: backlog
+  epic-4: in-progress
+  4-1-dynamic-progress-bars-and-completion-checklist: ready-for-dev
+  4-2-hold-period-tracker-and-state-info-card: ready-for-dev
   epic-4-retrospective: optional
 
   # Epic 5: State-Specific Report & PDF Export
-  epic-5: backlog
-  5-1-dynamic-html-report-renderer: backlog
-  5-2-dynamic-pdf-export: backlog
+  epic-5: in-progress
+  5-1-dynamic-html-report-renderer: ready-for-dev
+  5-2-dynamic-pdf-export: ready-for-dev
   epic-5-retrospective: optional
 
   # Epic 6: Account Settings & State Management
-  epic-6: backlog
-  6-1-account-settings-and-state-change: backlog
+  epic-6: in-progress
+  6-1-account-settings-and-state-change: ready-for-dev
   epic-6-retrospective: optional
 
   # Epic 7: Public State Information Pages
-  epic-7: backlog
-  7-1-public-state-information-pages: backlog
+  epic-7: in-progress
+  7-1-public-state-information-pages: ready-for-dev
   epic-7-retrospective: optional
 
   # Epic 8: Quality Assurance & Launch Readiness
-  epic-8: backlog
-  8-1-validatetrip-unit-tests: backlog
-  8-2-colorado-full-flow-end-to-end-test: backlog
-  8-3-final-tier-1-spot-check-and-launch-sign-off: backlog
+  epic-8: in-progress
+  8-1-validatetrip-unit-tests: ready-for-dev
+  8-2-colorado-full-flow-end-to-end-test: ready-for-dev
+  8-3-final-tier-1-spot-check-and-launch-sign-off: ready-for-dev
   epic-8-retrospective: optional
