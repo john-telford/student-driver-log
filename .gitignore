@@ -39,6 +39,7 @@ yarn-error.log*
 # local sqlite databases
 local.db
 test.db
+ci-build.db
 
 # vercel
 .vercel
