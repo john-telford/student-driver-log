@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { trips, users, type UserType } from '@/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { users, type UserType } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import TripsTable from './trips-table';
 import { resolveSelectedStudentId } from '../actions';
+import { listTrips } from '@/services/trips';
 
 export default async function TripsPage() {
   const session = await auth();
@@ -40,11 +41,7 @@ export default async function TripsPage() {
     studentId = userId;
   }
 
-  const tripRows = await db
-    .select()
-    .from(trips)
-    .where(eq(trips.studentId, studentId))
-    .orderBy(desc(trips.tripDate), desc(trips.id));
+  const tripRows = await listTrips(studentId);
 
   return (
     <div className="space-y-4">

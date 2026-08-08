@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { UnauthorizedError } from '@/services/errors';
+import { UnauthorizedError, ForbiddenError } from '@/services/errors';
 import type { UserType } from '@/db/schema';
 
 // Bearer-token auth for the `/api/v1` surface. This issues and verifies a
@@ -68,4 +68,15 @@ export async function requireApiUser(request: Request): Promise<ApiCaller> {
     }
     throw new UnauthorizedError('Invalid or expired token');
   }
+}
+
+// Resolve which student's data an API caller is acting on. v1 iOS = the student
+// logs in as their own account, so studentId is simply their own userId
+// (architecture D8). Parent-on-iOS is a deferred fast-follow: a parent caller
+// has no way to specify a student yet, so reject explicitly rather than guess.
+export function resolveApiStudentId(caller: ApiCaller): number {
+  if (caller.userType === 'student') {
+    return caller.userId;
+  }
+  throw new ForbiddenError('Parent API access is not supported yet');
 }
