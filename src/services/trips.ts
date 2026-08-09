@@ -1,6 +1,14 @@
 import { eq, desc } from 'drizzle-orm';
 import { db } from '@/db';
-import { trips, type Trip } from '@/db/schema';
+import {
+  trips,
+  locationTypes,
+  weatherConditions,
+  type Trip,
+  type LocationType,
+  type WeatherCondition,
+} from '@/db/schema';
+import { ValidationError } from '@/services/errors';
 
 // Trip business logic, shared by the web (Server Actions / Server Components)
 // and the REST API. Every function takes an explicit studentId and enforces
@@ -13,4 +21,110 @@ export async function listTrips(studentId: number): Promise<Trip[]> {
     .from(trips)
     .where(eq(trips.studentId, studentId))
     .orderBy(desc(trips.tripDate), desc(trips.id));
+}
+
+export type TripInput = {
+  tripDate?: unknown;
+  locationType?: unknown;
+  weather?: unknown;
+  daytimeMinutes?: unknown;
+  nighttimeMinutes?: unknown;
+  notes?: unknown;
+};
+
+export type TripContext = { studentId: number; createdBy: number };
+
+type ValidatedTrip = {
+  tripDate: string;
+  locationType: LocationType;
+  weather: WeatherCondition;
+  daytimeMinutes: number;
+  nighttimeMinutes: number;
+  notes: string | null;
+};
+
+// Validate a trip payload against the single source of truth for trip rules.
+// Field order and messages mirror the web form exactly so the web wrapper's
+// behavior is unchanged (NFR1/NFR3). Throws ValidationError on the first
+// failure with a single { field } — matching the web action's early return.
+function validateTrip(input: TripInput): ValidatedTrip {
+  const tripDate =
+    typeof input.tripDate === 'string' ? input.tripDate.trim() : '';
+  if (!tripDate) {
+    throw new ValidationError('Date is required.', { tripDate: 'Date is required.' });
+  }
+  if (new Date(tripDate) > new Date()) {
+    throw new ValidationError('Date cannot be in the future.', {
+      tripDate: 'Date cannot be in the future.',
+    });
+  }
+
+  if (
+    typeof input.locationType !== 'string' ||
+    !locationTypes.includes(input.locationType as LocationType)
+  ) {
+    throw new ValidationError('Select a location type.', {
+      locationType: 'Select a location type.',
+    });
+  }
+
+  if (
+    typeof input.weather !== 'string' ||
+    !weatherConditions.includes(input.weather as WeatherCondition)
+  ) {
+    throw new ValidationError('Select a weather condition.', {
+      weather: 'Select a weather condition.',
+    });
+  }
+
+  const daytimeMinutes = Number(input.daytimeMinutes ?? 0);
+  const nighttimeMinutes = Number(input.nighttimeMinutes ?? 0);
+  const inRange = (n: number) => Number.isFinite(n) && n >= 0 && n <= 600;
+  if (!inRange(daytimeMinutes) || !inRange(nighttimeMinutes)) {
+    throw new ValidationError('Minutes must be between 0 and 600.', {
+      minutes: 'Minutes must be between 0 and 600.',
+    });
+  }
+  if (daytimeMinutes === 0 && nighttimeMinutes === 0) {
+    throw new ValidationError('Enter at least 1 minute of driving time.', {
+      minutes: 'Enter at least 1 minute of driving time.',
+    });
+  }
+
+  const notes = typeof input.notes === 'string' ? input.notes.trim() : '';
+  if (notes.length > 500) {
+    throw new ValidationError('Notes must be 500 characters or fewer.', {
+      notes: 'Notes must be 500 characters or fewer.',
+    });
+  }
+
+  return {
+    tripDate,
+    locationType: input.locationType as LocationType,
+    weather: input.weather as WeatherCondition,
+    daytimeMinutes,
+    nighttimeMinutes,
+    notes: notes || null,
+  };
+}
+
+export async function createTrip(
+  input: TripInput,
+  ctx: TripContext
+): Promise<Trip> {
+  const v = validateTrip(input);
+  const [created] = await db
+    .insert(trips)
+    .values({
+      studentId: ctx.studentId,
+      createdBy: ctx.createdBy,
+      tripDate: v.tripDate,
+      locationType: v.locationType,
+      weather: v.weather,
+      daytimeMinutes: v.daytimeMinutes,
+      nighttimeMinutes: v.nighttimeMinutes,
+      notes: v.notes,
+    })
+    .returning();
+  return created;
 }

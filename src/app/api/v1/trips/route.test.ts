@@ -6,12 +6,12 @@ vi.mock('@/lib/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-auth')>();
   return { ...actual, requireApiUser: vi.fn() };
 });
-vi.mock('@/services/trips', () => ({ listTrips: vi.fn() }));
+vi.mock('@/services/trips', () => ({ listTrips: vi.fn(), createTrip: vi.fn() }));
 
 import { requireApiUser } from '@/lib/api-auth';
-import { listTrips } from '@/services/trips';
-import { UnauthorizedError } from '@/services/errors';
-import { GET, OPTIONS } from './route';
+import { listTrips, createTrip } from '@/services/trips';
+import { UnauthorizedError, ValidationError } from '@/services/errors';
+import { GET, POST, OPTIONS } from './route';
 
 const ALLOWED = 'http://localhost:3000';
 
@@ -65,6 +65,70 @@ describe('GET /api/v1/trips', () => {
     const res = await GET(get());
     expect(res.status).toBe(403);
     expect(listTrips).not.toHaveBeenCalled();
+  });
+});
+
+function post(body: unknown, origin?: string): Request {
+  return new Request('http://localhost:3000/api/v1/trips', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...(origin ? { origin } : {}) },
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+  });
+}
+
+describe('POST /api/v1/trips', () => {
+  const studentCaller = { userId: 42, userType: 'student' as const, parentId: 7 };
+
+  it('creates a trip and returns it with 201', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(studentCaller);
+    const created = { id: 9, studentId: 42, tripDate: '2026-01-01' };
+    vi.mocked(createTrip).mockResolvedValue(created as never);
+
+    const res = await POST(post({ tripDate: '2026-01-01' }, ALLOWED));
+    expect(res.status).toBe(201);
+    expect(await res.json()).toEqual(created);
+    // studentId and createdBy both the caller's own id
+    expect(createTrip).toHaveBeenCalledWith(expect.any(Object), {
+      studentId: 42,
+      createdBy: 42,
+    });
+  });
+
+  it('maps a ValidationError to 400 with fields', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(studentCaller);
+    vi.mocked(createTrip).mockRejectedValue(
+      new ValidationError('Date is required.', { tripDate: 'Date is required.' })
+    );
+
+    const res = await POST(post({}, ALLOWED));
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: { fields?: Record<string, string> } };
+    expect(json.error.fields).toEqual({ tripDate: 'Date is required.' });
+  });
+
+  it('returns 400 on a non-object body without calling the service', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(studentCaller);
+    const res = await POST(post('null', ALLOWED));
+    expect(res.status).toBe(400);
+    expect(createTrip).not.toHaveBeenCalled();
+  });
+
+  it('returns 401 with no token', async () => {
+    vi.mocked(requireApiUser).mockRejectedValue(new UnauthorizedError());
+    const res = await POST(post({ tripDate: '2026-01-01' }));
+    expect(res.status).toBe(401);
+    expect(createTrip).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 for a parent token', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue({
+      userId: 1,
+      userType: 'parent',
+      parentId: null,
+    });
+    const res = await POST(post({ tripDate: '2026-01-01' }));
+    expect(res.status).toBe(403);
+    expect(createTrip).not.toHaveBeenCalled();
   });
 });
 
