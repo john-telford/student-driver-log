@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { renderToBuffer } from '@react-pdf/renderer';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { trips, users, type UserType } from '@/db/schema';
+import { users, type UserType } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { resolveSelectedStudentId } from '@/app/(app)/actions';
-import { ReportDocument } from './document';
+import { buildReportPdf } from './build';
 
 export async function GET() {
   const session = await auth();
@@ -40,36 +39,7 @@ export async function GET() {
     studentName = student?.name ?? null;
   }
 
-  const tripRows = await db
-    .select()
-    .from(trips)
-    .where(eq(trips.studentId, studentId))
-    .orderBy(trips.tripDate, trips.id);
-
-  let runningDay = 0;
-  let runningNight = 0;
-  const rows = tripRows.map((trip) => {
-    runningDay += trip.daytimeMinutes;
-    runningNight += trip.nighttimeMinutes;
-    return { ...trip, runningDay, runningNight, grandTotal: runningDay + runningNight };
-  });
-
-  const printedDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-
-  const buffer = await renderToBuffer(
-    <ReportDocument
-      rows={rows}
-      studentName={studentName}
-      parentName={parentName}
-      totalDay={runningDay}
-      totalNight={runningNight}
-      printedDate={printedDate}
-    />
-  );
-
-  const filename = `driving-log-${studentName?.toLowerCase().replace(/\s+/g, '-') ?? 'report'}.pdf`;
+  const { buffer, filename } = await buildReportPdf(studentId, studentName, parentName);
 
   return new NextResponse(new Uint8Array(buffer), {
     status: 200,
