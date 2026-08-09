@@ -4,8 +4,10 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { trips, users, locationTypes, weatherConditions, type UserType } from '@/db/schema';
+import { trips, users, type UserType } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { updateTrip } from '@/services/trips';
+import { ValidationError, NotFoundError } from '@/services/errors';
 
 export type TripEditState = {
   success?: true;
@@ -65,56 +67,34 @@ export async function updateTripAction(
   const studentId = await resolveStudentId(userId, userType);
   if (!studentId) return { errors: { form: 'No student selected.' } };
 
-  // Verify trip belongs to this student
-  const [existing] = await db
-    .select({ id: trips.id })
-    .from(trips)
-    .where(and(eq(trips.id, tripId), eq(trips.studentId, studentId)));
-  if (!existing) return { errors: { form: 'Trip not found.' } };
-
-  // trip_date
-  const tripDate = (formData.get('tripDate') as string | null)?.trim() ?? '';
-  if (!tripDate) return { errors: { tripDate: 'Date is required.' } };
-  if (new Date(tripDate) > new Date()) {
-    return { errors: { tripDate: 'Date cannot be in the future.' } };
-  }
-
-  // location_type
-  const locationType = formData.get('locationType') as string | null;
-  if (!locationType || !locationTypes.includes(locationType as never)) {
-    return { errors: { locationType: 'Select a location type.' } };
-  }
-
-  // weather
-  const weather = formData.get('weather') as string | null;
-  if (!weather || !weatherConditions.includes(weather as never)) {
-    return { errors: { weather: 'Select a weather condition.' } };
-  }
-
-  // minutes
+  // Clamp minutes to 0–600 as input normalization (matches createTripAction's
+  // pattern from story 1.3), then delegate ownership check + validation +
+  // update to the shared service.
   const daytimeMinutes = Math.max(0, Math.min(600, Number(formData.get('daytimeMinutes') ?? 0)));
   const nighttimeMinutes = Math.max(0, Math.min(600, Number(formData.get('nighttimeMinutes') ?? 0)));
-  if (daytimeMinutes === 0 && nighttimeMinutes === 0) {
-    return { errors: { minutes: 'Enter at least 1 minute of driving time.' } };
-  }
 
-  // notes
-  const notes = (formData.get('notes') as string | null)?.trim() ?? '';
-  if (notes.length > 500) {
-    return { errors: { notes: 'Notes must be 500 characters or fewer.' } };
+  try {
+    await updateTrip(
+      tripId,
+      {
+        tripDate: (formData.get('tripDate') as string | null)?.trim() ?? '',
+        locationType: formData.get('locationType'),
+        weather: formData.get('weather'),
+        daytimeMinutes,
+        nighttimeMinutes,
+        notes: (formData.get('notes') as string | null)?.trim() ?? '',
+      },
+      { studentId }
+    );
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return { errors: { form: 'Trip not found.' } };
+    }
+    if (err instanceof ValidationError && err.fields) {
+      return { errors: err.fields as TripEditState['errors'] };
+    }
+    throw err;
   }
-
-  await db
-    .update(trips)
-    .set({
-      tripDate,
-      locationType: locationType as typeof locationTypes[number],
-      weather: weather as typeof weatherConditions[number],
-      daytimeMinutes,
-      nighttimeMinutes,
-      notes: notes || null,
-    })
-    .where(eq(trips.id, tripId));
 
   return { success: true };
 }

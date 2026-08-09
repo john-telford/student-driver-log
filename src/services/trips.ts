@@ -1,4 +1,4 @@
-import { eq, desc } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   trips,
@@ -8,7 +8,7 @@ import {
   type LocationType,
   type WeatherCondition,
 } from '@/db/schema';
-import { ValidationError } from '@/services/errors';
+import { ValidationError, NotFoundError } from '@/services/errors';
 
 // Trip business logic, shared by the web (Server Actions / Server Components)
 // and the REST API. Every function takes an explicit studentId and enforces
@@ -127,4 +127,36 @@ export async function createTrip(
     })
     .returning();
   return created;
+}
+
+export async function updateTrip(
+  tripId: number,
+  input: TripInput,
+  ctx: { studentId: number }
+): Promise<Trip> {
+  // Ownership check FIRST — a non-owned/non-existent trip never reaches
+  // validation, matching the web action's existing order and hiding whether
+  // the id exists at all (NFR2).
+  const [existing] = await db
+    .select({ id: trips.id })
+    .from(trips)
+    .where(and(eq(trips.id, tripId), eq(trips.studentId, ctx.studentId)));
+  if (!existing) {
+    throw new NotFoundError('Trip not found.');
+  }
+
+  const v = validateTrip(input);
+  const [updated] = await db
+    .update(trips)
+    .set({
+      tripDate: v.tripDate,
+      locationType: v.locationType,
+      weather: v.weather,
+      daytimeMinutes: v.daytimeMinutes,
+      nighttimeMinutes: v.nighttimeMinutes,
+      notes: v.notes,
+    })
+    .where(eq(trips.id, tripId))
+    .returning();
+  return updated;
 }
