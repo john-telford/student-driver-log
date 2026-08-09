@@ -1,14 +1,11 @@
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users, trips, type UserType } from '@/db/schema';
-import { eq, and, desc, sum } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { resolveSelectedStudentId } from '../actions';
 import { formatHMM } from '@/lib/utils';
-
-// Illinois learner permit requirements
-const TOTAL_REQUIRED_MIN = 50 * 60;   // 3000 min
-const NIGHT_REQUIRED_MIN = 10 * 60;   // 600 min
+import { getReport } from '@/services/report';
 
 const locationLabels: Record<string, string> = {
   highway: 'Highway', residential: 'Residential', rural: 'Rural',
@@ -64,24 +61,8 @@ export default async function DashboardPage() {
     selectedStudentId = userId;
   }
 
-  // Aggregate totals
-  let totalDaytime = 0;
-  let totalNighttime = 0;
-  if (selectedStudentId) {
-    const [totals] = await db
-      .select({
-        daytime: sum(trips.daytimeMinutes),
-        nighttime: sum(trips.nighttimeMinutes),
-      })
-      .from(trips)
-      .where(eq(trips.studentId, selectedStudentId));
-    totalDaytime = Number(totals?.daytime ?? 0);
-    totalNighttime = Number(totals?.nighttime ?? 0);
-  }
-  const grandTotal = totalDaytime + totalNighttime;
-
-  const totalPct = Math.min(100, Math.round((grandTotal / TOTAL_REQUIRED_MIN) * 100));
-  const nightPct = Math.min(100, Math.round((totalNighttime / NIGHT_REQUIRED_MIN) * 100));
+  // Aggregate totals + progress
+  const report = selectedStudentId ? await getReport(selectedStudentId) : null;
 
   // Recent trips (last 5)
   const recentTrips = selectedStudentId
@@ -101,7 +82,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Hour totals + progress */}
-      {selectedStudentId ? (
+      {report ? (
         <div className="rounded border border-border bg-card p-6 space-y-6">
           <h2 className="text-sm font-black uppercase tracking-wide text-foreground">
             Progress{selectedStudentName ? ` — ${selectedStudentName}` : ''}
@@ -110,9 +91,9 @@ export default async function DashboardPage() {
           {/* Stat row */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'Daytime', value: formatHMM(totalDaytime) },
-              { label: 'Nighttime', value: formatHMM(totalNighttime) },
-              { label: 'Total', value: formatHMM(grandTotal) },
+              { label: 'Daytime', value: formatHMM(report.daytimeMinutes) },
+              { label: 'Nighttime', value: formatHMM(report.nighttimeMinutes) },
+              { label: 'Total', value: formatHMM(report.totalMinutes) },
             ].map(({ label, value }) => (
               <div key={label} className="rounded border border-border p-4 text-center">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
@@ -125,40 +106,40 @@ export default async function DashboardPage() {
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
               <p className="text-xs font-bold uppercase tracking-wider text-foreground">50-Hour Requirement</p>
-              <p className="text-xs text-muted-foreground">{remainingHours(grandTotal, TOTAL_REQUIRED_MIN)}</p>
+              <p className="text-xs text-muted-foreground">{remainingHours(report.totalMinutes, report.totalRequiredMinutes)}</p>
             </div>
             <div className="relative group">
               <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${totalPct}%` }}
+                  style={{ width: `${report.totalPercent}%` }}
                 />
               </div>
               <div className="pointer-events-none absolute left-0 -top-8 hidden group-hover:block rounded bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md whitespace-nowrap">
-                {formatHMM(grandTotal)} total ({formatHMM(totalDaytime)} day + {formatHMM(totalNighttime)} night)
+                {formatHMM(report.totalMinutes)} total ({formatHMM(report.daytimeMinutes)} day + {formatHMM(report.nighttimeMinutes)} night)
               </div>
             </div>
-            <p className="text-xs text-muted-foreground text-right">{totalPct}% of 50:00</p>
+            <p className="text-xs text-muted-foreground text-right">{report.totalPercent}% of 50:00</p>
           </div>
 
           {/* 10-hour night progress */}
           <div className="space-y-1.5">
             <div className="flex items-baseline justify-between">
               <p className="text-xs font-bold uppercase tracking-wider text-foreground">10-Hour Night Requirement</p>
-              <p className="text-xs text-muted-foreground">{remainingHours(totalNighttime, NIGHT_REQUIRED_MIN)}</p>
+              <p className="text-xs text-muted-foreground">{remainingHours(report.nighttimeMinutes, report.nightRequiredMinutes)}</p>
             </div>
             <div className="relative group">
               <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full rounded-full bg-accent transition-all"
-                  style={{ width: `${nightPct}%` }}
+                  style={{ width: `${report.nightPercent}%` }}
                 />
               </div>
               <div className="pointer-events-none absolute left-0 -top-8 hidden group-hover:block rounded bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md whitespace-nowrap">
-                {formatHMM(totalNighttime)} nighttime
+                {formatHMM(report.nighttimeMinutes)} nighttime
               </div>
             </div>
-            <p className="text-xs text-muted-foreground text-right">{nightPct}% of 10:00</p>
+            <p className="text-xs text-muted-foreground text-right">{report.nightPercent}% of 10:00</p>
           </div>
         </div>
       ) : (

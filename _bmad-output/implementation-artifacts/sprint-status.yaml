@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-08-08T20:55:49Z
-last_updated: 2026-08-09T16:32:00Z
+last_updated: 2026-08-09T17:30:00Z
 project: student-driver-log
 project_key: NOKEY
 tracking_system: file-system
@@ -52,7 +52,7 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Review driving progress from a native client
-  epic-2: backlog
-  2-1-retrieve-report-totals-from-a-native-client: backlog
+  epic-2: in-progress
+  2-1-retrieve-report-totals-from-a-native-client: review
   2-2-download-the-official-pdf-log-from-a-native-client: backlog
   epic-2-retrospective: optional
