@@ -1,6 +1,6 @@
 # Story 2.1: Retrieve report totals from a native client
 
-Status: review
+Status: done
 
 ## Story
 
@@ -64,6 +64,12 @@ computed inline in `src/app/(app)/dashboard/page.tsx` against `TOTAL_REQUIRED_MI
   - [x] `src/services/report.test.ts` — `getReport`: aggregates a student's trips into the right shape; zero trips (both `null` aggregate fields and an empty result row) → all-zero `Report` with correct `totalRequiredMinutes`/`nightRequiredMinutes` and `0` percents (not `NaN`); percent clamps at `100` when totals exceed the requirement; percent rounds correctly on a non-round fraction (1000/3000 → 33%). Mocked `@/db` the same way `trips.test.ts` mocks the `select().from().where()` chain (awaited directly, no `.orderBy()`).
   - [x] `src/app/api/v1/report/route.test.ts` — mirrors `trips/route.test.ts`'s structure: mocks `@/lib/api-auth`'s `requireApiUser` (keeps `resolveApiStudentId` real), mocks `@/services/report`'s `getReport`. Cases: valid student token → `200` + JSON body equals the mocked report + CORS header present; missing/invalid token → `401`; parent token → `403`; `OPTIONS` → `204` with CORS headers.
   - [x] Full suite green (`npm test -- --run` → 82 tests, 9 files, all passing) + `npm run build` clean (with placeholder `DATABASE_URL`/`AUTH_SECRET`/`API_JWT_SECRET`, matching the CI build step) + `npx eslint .` — the 15 pre-existing errors are all in files untouched by this story (`report/page.tsx`, `about`/`faq`/`privacy`/`terms`/`not-found`/`opengraph-image`); zero new lint errors in any file this story touched. Playwright e2e was not run (unit/integration coverage plus the confirmed-clean build were judged sufficient for this story's scope — no new UI, only a data-source swap behind existing JSX).
+
+### Review Findings
+
+_Code review 2026-08-09 (Blind Hunter + Edge Case Hunter + Acceptance Auditor). Acceptance Auditor: no AC violations; percent formula, ownership scoping, and `Report` JSON contract all verified faithful._
+
+- [x] [Review][Decision] No `Cache-Control: no-store` on `GET /api/v1/report` — the Bearer-auth endpoint returns the caller's personal totals/progress with no cache directive. **Resolved 2026-08-09: leave as-is** (authenticated responses aren't cached by shared caches; native client may want to cache locally). [src/app/api/v1/report/route.ts]
 
 ## Dev Notes
 

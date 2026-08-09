@@ -41,7 +41,8 @@ export async function buildReportPdf(
     />
   );
 
-  const filename = `driving-log-${studentName?.toLowerCase().replace(/\s+/g, '-') ?? 'report'}.pdf`;
+  const slug = studentName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const filename = `driving-log-${slug || 'report'}.pdf`;
 
   return { buffer, filename };
 }

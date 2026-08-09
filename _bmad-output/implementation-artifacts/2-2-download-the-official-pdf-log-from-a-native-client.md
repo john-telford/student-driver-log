@@ -1,6 +1,6 @@
 # Story 2.2: Download the official PDF log from a native client
 
-Status: review
+Status: done
 
 ## Story
 
@@ -79,6 +79,13 @@ replacement, so both the web and native surfaces keep working (AC3).
   - [x] `src/app/api/report/pdf/route.test.ts` — **new file; no test existed for this route before.** Added for real regression coverage on AC 3, not just "nothing else broke." Mock `@/auth`'s `auth()`, mock `@/app/(app)/actions`'s `resolveSelectedStudentId`, mock `./build`'s `buildReportPdf`. Cases: no session → `401`; parent session with no resolved student → `400`; parent session with a student → resolves name/parent-name, calls `buildReportPdf`, returns `200` with `Content-Type: application/pdf` and the `Content-Disposition` header from the mocked filename; student session → `buildReportPdf` called with the student's own id and `parentName: null`.
   - [x] `src/app/api/v1/report/pdf/route.test.ts` — mirror the other `/api/v1` route tests: mock `@/lib/api-auth`'s `requireApiUser` (keep `resolveApiStudentId` real), mock `@/db` for the name lookup, mock `./build`'s… actually mock `@/app/api/report/pdf/build`'s `buildReportPdf`. Cases: valid student token → `200`, `Content-Type: application/pdf`, CORS header present, `buildReportPdf` called with `(studentId, studentName, null)`; missing/invalid token → `401`, `buildReportPdf` not called; parent token → `403`, `buildReportPdf` not called; `OPTIONS` → `204` with CORS headers.
   - [x] Full suite green (`npm test -- --run`) + `npm run build` + `npx eslint .` clean (no new errors — the project has 15 pre-existing, unrelated lint errors elsewhere; do not fix or touch those files).
+
+### Review Findings
+
+_Code review 2026-08-09 (Blind Hunter + Edge Case Hunter + Acceptance Auditor). Acceptance Auditor: no AC violations._
+
+- [x] [Review][Decision] No `Cache-Control: no-store` on `GET /api/v1/report/pdf` — the Bearer-auth endpoint returns the caller's official PDF log with no cache directive. **Resolved 2026-08-09: leave as-is** (authenticated responses aren't cached by shared caches; a native client may legitimately want to cache the PDF locally). [src/app/api/v1/report/pdf/route.ts]
+- [x] [Review][Patch] **Fixed 2026-08-09** — Download filename slug not robust — `studentName?.toLowerCase().replace(/\s+/g, '-') ?? 'report'` only collapses whitespace: a `"` or `\` in the name corrupts the quoted `Content-Disposition` header, and an empty/whitespace-only name bypasses the `?? 'report'` fallback (→ `driving-log-.pdf`) and produces stray leading/trailing hyphens. Not CRLF injection (newlines collapse to `-`). Fix: slugify with `.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')` and fall back to `'report'` when the result is empty. Note: extracted verbatim from the web route (pre-existing), but story 2.2 newly exposes it on the Bearer endpoint. [src/app/api/report/pdf/build.tsx:44]
 
 ## Dev Notes
 
