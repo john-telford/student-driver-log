@@ -37,6 +37,16 @@ describe('issueApiToken / requireApiUser round-trip', () => {
     const caller = await requireApiUser(req(`Bearer ${token}`));
     expect(caller.parentId).toBeNull();
   });
+
+  it('accepts a case-insensitive bearer scheme (RFC 7235)', async () => {
+    const token = await issueApiToken({
+      id: 42,
+      userType: 'student',
+      parentId: 7,
+    });
+    const caller = await requireApiUser(req(`bearer ${token}`));
+    expect(caller.userId).toBe(42);
+  });
 });
 
 describe('requireApiUser rejections', () => {
@@ -68,6 +78,19 @@ describe('requireApiUser rejections', () => {
 
     await expect(
       requireApiUser(req(`Bearer ${forged}`))
+    ).rejects.toBeInstanceOf(UnauthorizedError);
+  });
+
+  it('rejects a validly-signed token whose sub is not a number', async () => {
+    const bad = await new SignJWT({ userType: 'student', parentId: null })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject('not-a-number')
+      .setIssuedAt()
+      .setExpirationTime('8h')
+      .sign(new TextEncoder().encode(SECRET));
+
+    await expect(
+      requireApiUser(req(`Bearer ${bad}`))
     ).rejects.toBeInstanceOf(UnauthorizedError);
   });
 

@@ -53,7 +53,13 @@ function validateTrip(input: TripInput): ValidatedTrip {
   if (!tripDate) {
     throw new ValidationError('Date is required.', { tripDate: 'Date is required.' });
   }
-  if (new Date(tripDate) > new Date()) {
+  const parsedDate = new Date(tripDate);
+  if (Number.isNaN(parsedDate.getTime())) {
+    throw new ValidationError('Enter a valid date.', {
+      tripDate: 'Enter a valid date.',
+    });
+  }
+  if (parsedDate > new Date()) {
     throw new ValidationError('Date cannot be in the future.', {
       tripDate: 'Date cannot be in the future.',
     });
@@ -77,9 +83,19 @@ function validateTrip(input: TripInput): ValidatedTrip {
     });
   }
 
-  const daytimeMinutes = Number(input.daytimeMinutes ?? 0);
-  const nighttimeMinutes = Number(input.nighttimeMinutes ?? 0);
-  const inRange = (n: number) => Number.isFinite(n) && n >= 0 && n <= 600;
+  // Accept only a number or a numeric string — a boolean/array/object would
+  // otherwise coerce to a misleading value (true→1, []→0) and slip through.
+  const toMinutes = (v: unknown): number => {
+    if (v == null) return 0;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'string' && v.trim() !== '') return Number(v);
+    return NaN;
+  };
+  const daytimeMinutes = toMinutes(input.daytimeMinutes);
+  const nighttimeMinutes = toMinutes(input.nighttimeMinutes);
+  // Whole minutes only, 0–600. The web wrappers pre-clamp+round, so they never
+  // reach this rejection — the rule lives here once (NFR1).
+  const inRange = (n: number) => Number.isInteger(n) && n >= 0 && n <= 600;
   if (!inRange(daytimeMinutes) || !inRange(nighttimeMinutes)) {
     throw new ValidationError('Minutes must be between 0 and 600.', {
       minutes: 'Minutes must be between 0 and 600.',
@@ -156,8 +172,15 @@ export async function updateTrip(
       nighttimeMinutes: v.nighttimeMinutes,
       notes: v.notes,
     })
-    .where(eq(trips.id, tripId))
+    // Keep the studentId predicate on the write itself (defense-in-depth), not
+    // just on the ownership check above. If the row was deleted between the two
+    // statements, `returning()` is empty — treat that as not-found rather than
+    // returning undefined.
+    .where(and(eq(trips.id, tripId), eq(trips.studentId, ctx.studentId)))
     .returning();
+  if (!updated) {
+    throw new NotFoundError('Trip not found.');
+  }
   return updated;
 }
 
@@ -177,5 +200,8 @@ export async function deleteTrip(
     throw new NotFoundError('Trip not found.');
   }
 
-  await db.delete(trips).where(eq(trips.id, tripId));
+  // Keep the studentId predicate on the delete itself (defense-in-depth).
+  await db
+    .delete(trips)
+    .where(and(eq(trips.id, tripId), eq(trips.studentId, ctx.studentId)));
 }

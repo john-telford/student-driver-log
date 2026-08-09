@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
     } catch {
       throw new ValidationError('Invalid JSON body.', { body: 'Invalid JSON body.' });
     }
-    if (typeof body !== 'object' || body === null) {
+    if (typeof body !== 'object' || body === null || Array.isArray(body)) {
       throw new ValidationError('Invalid JSON body.', { body: 'Invalid JSON body.' });
     }
 

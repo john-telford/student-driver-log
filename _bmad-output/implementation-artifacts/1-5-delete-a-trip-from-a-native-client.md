@@ -1,6 +1,6 @@
 # Story 1.5: Delete a trip from a native client
 
-Status: review
+Status: done
 
 ## Story
 
@@ -93,3 +93,28 @@ claude-sonnet-5 (BMAD dev-story, autonomous run)
 ### Change Log
 
 - 2026-08-09 — Implemented story 1.5: `deleteTrip` service, `DELETE /api/v1/trips/:id`, web `deleteTripAction` refactor. 65 tests green, build clean, full live CRUD + ownership-isolation round-trip verified. Status → review (code review pending on Opus). **Epic 1 dev work complete — all 5 stories implemented and awaiting review.**
+
+## Review Findings (Code Review 2026-08-09, Opus — Blind/Edge/Auditor)
+
+_Branch-level review of stories 1.3–1.5 (diff `ios-app` vs `main`). This is the epic-closing story, so cross-cutting shared-layer findings and the full defer/dismiss list are consolidated here. Story-owned findings are in 1.3 and 1.4._
+
+**Own patch (shared with 1.4):**
+
+- [x] [Review][Patch] `deleteTrip` write drops the `studentId` predicate [src/services/trips.ts `deleteTrip`] — same shape as the 1.4 finding: ownership `SELECT`-then-`DELETE where id` only. Restore `and(eq(id), eq(studentId))` on the delete for defense-in-depth. (blind+edge, Medium)
+
+**Cross-cutting / shared auth layer (from story 1.1 code; ships on this branch, so actioned now):**
+
+- [x] [Review][Patch] Token response not marked non-cacheable [src/app/api/v1/auth/token/route.ts] — add `Cache-Control: no-store` so the Bearer token isn't cached by any intermediary/proxy. (blind, Medium)
+- [x] [Review][Patch] `jwtVerify` doesn't pin the algorithm [src/lib/api-auth.ts] — pass `{ algorithms: ['HS256'] }`. Not exploitable (symmetric key → jose is HMAC-only), but the defensive norm. (blind, Low)
+- [x] [Review][Patch] `Number(payload.sub)` unguarded → `NaN` userId [src/lib/api-auth.ts] — a validly-signed token with a missing/non-numeric `sub` produces `userId = NaN`, which flows into ownership queries as `eq(studentId, NaN)` (silent wrong-identity) rather than a 401. Add `Number.isInteger(userId)` guard → `UnauthorizedError`. (edge, Low)
+- [x] [Review][Patch] Bearer scheme match is case-sensitive [src/lib/api-auth.ts] — `header.startsWith('Bearer ')` rejects the RFC-7235-valid lowercase `bearer`. Parse the scheme case-insensitively. (edge, Low)
+
+**Deferred (pre-existing / broader — see `deferred-work.md`):**
+
+- [x] [Review][Defer] Inconsistent error contract [src/app/api/v1/auth/token/route.ts] — token route emits `invalid_request`/`invalid_credentials` while every other route uses `validation_error`/`unauthorized` via `api-error.ts`. Pre-existing (1.1); broader contract cleanup.
+- [x] [Review][Defer] Unknown/non-typed errors bypass CORS and return a bare 500 [src/lib/api-error.ts] — `errorResponse` re-throws before `withCors` runs. Pre-existing and explicitly accepted in the 1.2 review (server-fault path).
+- [x] [Review][Defer] No rate limiting + user-enumeration timing on `POST /api/v1/auth/token` [src/services/auth.ts] — bcrypt is skipped for unknown emails; rate-limiting is an architecture §8 fast-follow.
+- [x] [Review][Defer] `Access-Control-Allow-Credentials: true` unnecessary for a Bearer API [src/lib/cors.ts] — not the wildcard anti-pattern (origin is allow-listed), but least-privilege says drop it since routes never read cookies. Pre-existing (1.1).
+- [x] [Review][Defer] `tripDate` future-check uses UTC-midnight vs a now-instant (timezone edge) [src/services/trips.ts] — can falsely reject "today" for UTC-ahead clients; near-zero impact for a Chicago/IL single-tz personal app, and altering the shared validation risks web parity (NFR3).
+
+**Dismissed as noise (3):** clamp-vs-reject minutes divergence (intended & spec'd per NFR1, auditor-verified satisfied); non-numeric-minutes web→NaN parity change (not reachable via the number input, and the new behavior is a strict improvement); standalone "type-confused minutes" (folded into the 1.3 fractional-minutes patch).

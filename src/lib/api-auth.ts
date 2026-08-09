@@ -44,19 +44,30 @@ export async function issueApiToken(user: {
 // header, wrong scheme, malformed/tampered token, or expiry. Never logs the token.
 export async function requireApiUser(request: Request): Promise<ApiCaller> {
   const header = request.headers.get('authorization');
-  if (!header || !header.startsWith('Bearer ')) {
+  // The `Bearer` scheme is case-insensitive per RFC 7235.
+  if (!header || header.slice(0, 7).toLowerCase() !== 'bearer ') {
     throw new UnauthorizedError('Missing or malformed Authorization header');
   }
 
-  const token = header.slice('Bearer '.length).trim();
+  const token = header.slice(7).trim();
   if (!token) {
     throw new UnauthorizedError('Missing bearer token');
   }
 
   try {
-    const { payload } = await jwtVerify(token, getApiSecret());
+    // Pin the algorithm to HS256 — jose is HMAC-only with a symmetric key
+    // anyway, but pinning is the defensive norm.
+    const { payload } = await jwtVerify(token, getApiSecret(), {
+      algorithms: ['HS256'],
+    });
+    const userId = Number(payload.sub);
+    if (!Number.isInteger(userId)) {
+      // A missing/non-numeric `sub` must not become a NaN userId that then
+      // flows into ownership queries — reject it as an invalid token.
+      throw new UnauthorizedError('Invalid token subject');
+    }
     return {
-      userId: Number(payload.sub),
+      userId,
       userType: payload.userType as UserType,
       parentId: (payload.parentId as number | null) ?? null,
     };

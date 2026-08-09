@@ -1,6 +1,6 @@
 # Story 1.4: Edit a trip from a native client
 
-Status: review
+Status: done
 
 ## Story
 
@@ -95,3 +95,16 @@ claude-sonnet-5 (BMAD dev-story, autonomous run)
 ### Change Log
 
 - 2026-08-09 — Implemented story 1.4: `updateTrip` service (ownership-before-validation), `PATCH /api/v1/trips/:id`, web `updateTripAction` refactor. 58 tests green, build clean. Status → review (code review pending on Opus).
+
+## Review Findings (Code Review 2026-08-09, Opus — Blind/Edge/Auditor)
+
+_Branch-level review of stories 1.3–1.5. Cross-cutting/shared-layer findings and the full defer/dismiss list are in story 1.5. Below are findings owned by 1.4's code._
+
+**Decision needed:**
+
+- [x] [Review][Decision → resolved: keep full-replace, documented] `PATCH` requires ALL fields (behaves like PUT) [src/services/trips.ts `updateTrip` / [id]/route.ts] — `updateTrip` runs the full `validateTrip`, so a partial `PATCH` 400s on the first missing field. **Decision (John, 2026-08-09): keep full-replace (PUT-style) semantics for v1 — the iOS edit screen submits the whole form.** Action: add a clarifying comment on the `PATCH` handler noting the client must send all fields. No behavior change.
+
+**Patch:**
+
+- [x] [Review][Patch] Ownership predicate dropped from the UPDATE/DELETE write + unhandled empty return [src/services/trips.ts `updateTrip`/`deleteTrip`] — the ownership `SELECT` runs first (good), but the mutating statement now filters by `id` only; the `studentId` predicate that the file's own comment calls "the security boundary" is gone from the write. Also, if the row vanishes between select and write, `.returning()` is empty → `updateTrip` returns `undefined` → route emits **200 with a `null` body** instead of 404. Restore `and(eq(id), eq(studentId))` on the write and throw `NotFoundError` when `returning()` is empty (closes the TOCTOU too). (blind+edge, Medium) — also affects 1.5's `deleteTrip`.
+- [x] [Review][Patch] `parseTripId` accepts hex / exponent / negative / empty [src/app/api/v1/trips/[id]/route.ts `parseTripId`] — `Number("0x10")`→16, `"1e3"`→1000, `"-5"`, `""`→0 all satisfy `Number.isInteger`. Ownership still gates access (→404, no leak), but the id contract is looser than "positive integer." Tighten to a canonical positive decimal. (blind+edge+auditor, Low)

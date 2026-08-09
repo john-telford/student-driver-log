@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-08-08T20:55:49Z
-last_updated: 2026-08-09T15:12:00Z
+last_updated: 2026-08-09T16:32:00Z
 project: student-driver-log
 project_key: NOKEY
 tracking_system: file-system
@@ -46,9 +46,9 @@ development_status:
   epic-1: in-progress
   1-1-authenticate-from-a-native-client: done
   1-2-list-my-trips-from-a-native-client: done
-  1-3-create-a-trip-from-a-native-client: review
-  1-4-edit-a-trip-from-a-native-client: review
-  1-5-delete-a-trip-from-a-native-client: review
+  1-3-create-a-trip-from-a-native-client: done
+  1-4-edit-a-trip-from-a-native-client: done
+  1-5-delete-a-trip-from-a-native-client: done
   epic-1-retrospective: optional
 
   # Epic 2: Review driving progress from a native client

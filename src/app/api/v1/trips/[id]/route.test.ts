@@ -76,6 +76,20 @@ describe('PATCH /api/v1/trips/:id', () => {
     expect(updateTrip).not.toHaveBeenCalled();
   });
 
+  it('returns 400 on a JSON array body without calling the service', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(studentCaller);
+    const res = await PATCH(patch('10', []), ctx('10'));
+    expect(res.status).toBe(400);
+    expect(updateTrip).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 on a non-canonical id (hex/exponent) without calling the service', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(studentCaller);
+    const res = await PATCH(patch('0x10', { tripDate: '2026-01-01' }), ctx('0x10'));
+    expect(res.status).toBe(400);
+    expect(updateTrip).not.toHaveBeenCalled();
+  });
+
   it('returns 401 with no valid token', async () => {
     vi.mocked(requireApiUser).mockRejectedValue(new UnauthorizedError());
     const res = await PATCH(patch('10', { tripDate: '2026-01-01' }), ctx('10'));

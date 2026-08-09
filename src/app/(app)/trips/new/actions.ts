@@ -50,11 +50,12 @@ export async function createTripAction(
     studentId = createdBy;
   }
 
-  // Clamp minutes to 0–600 as input normalization (preserves the existing web
-  // UX of silently accepting out-of-range spinner values), then delegate all
-  // validation + the insert to the shared service.
-  const daytimeMinutes = Math.max(0, Math.min(600, Number(formData.get('daytimeMinutes') ?? 0)));
-  const nighttimeMinutes = Math.max(0, Math.min(600, Number(formData.get('nighttimeMinutes') ?? 0)));
+  // Clamp + round minutes to a whole 0–600 as input normalization (preserves
+  // the existing web UX of silently accepting out-of-range spinner values;
+  // rounding keeps the service's whole-minute rule from ever firing on the web),
+  // then delegate all validation + the insert to the shared service.
+  const daytimeMinutes = Math.round(Math.max(0, Math.min(600, Number(formData.get('daytimeMinutes') ?? 0))));
+  const nighttimeMinutes = Math.round(Math.max(0, Math.min(600, Number(formData.get('nighttimeMinutes') ?? 0))));
 
   try {
     await createTrip(

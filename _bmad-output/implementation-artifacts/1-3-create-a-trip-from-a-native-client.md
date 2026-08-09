@@ -1,6 +1,6 @@
 # Story 1.3: Create a trip from a native client
 
-Status: review
+Status: done
 
 ## Story
 
@@ -100,3 +100,13 @@ claude-sonnet-5 (BMAD dev-story, autonomous run)
 ### Change Log
 
 - 2026-08-09 — Implemented story 1.3: `createTrip` service with validation, `POST /api/v1/trips`, web `createTripAction` refactor. 47 tests green, build clean. Status → review (code review pending on Opus).
+
+## Review Findings (Code Review 2026-08-09, Opus — Blind/Edge/Auditor)
+
+_Branch-level review of stories 1.3–1.5. Cross-cutting/shared-layer findings and the full defer/dismiss list are recorded in story 1.5. Below are findings owned by 1.3's code._
+
+**Patch:**
+
+- [x] [Review][Patch] Invalid non-empty `tripDate` strings bypass validation and persist [src/services/trips.ts `validateTrip`] — `new Date(tripDate) > new Date()` is `false` for an `Invalid Date` (NaN compare), so `"banana"`/`"2026-13-45"` pass the required + future checks and the raw string is stored in the `text` column. Add `Number.isNaN(new Date(tripDate).getTime())` guard. (blind+edge, **High** — data integrity on the app's core record.) NB: web was protected by the date `<input>`, so this doesn't change real web behavior (NFR3 safe).
+- [x] [Review][Patch] Fractional / type-confused minutes accepted [src/services/trips.ts `inRange`] — `inRange` checks `Number.isFinite` but not `Number.isInteger`, so `45.7` (and `true`→1, `[]`→0, `["45"]`→45) pass into the `integer` column. Add an integer + `typeof === 'number' || string` guard (reject, consistent with the existing range rejection; floor-instead-of-reject is the alternative). (edge+blind, Medium)
+- [x] [Review][Patch] Array JSON body bypasses the non-object guard [src/app/api/v1/trips/route.ts + [id]/route.ts + auth/token/route.ts] — `typeof [] === 'object' && [] !== null` is true, so a JSON array body slips past the "invalid body" 400 guard. Degrades safely (missing keys → validation 400) but should be rejected as malformed. Use `Array.isArray`/plain-object check. (edge, Low)

@@ -144,6 +144,24 @@ describe('createTrip — validation (never inserts)', () => {
       'notes',
       'Notes must be 500 characters or fewer.',
     ],
+    [
+      'invalid (unparseable) date string',
+      { ...validInput, tripDate: 'banana' },
+      'tripDate',
+      'Enter a valid date.',
+    ],
+    [
+      'fractional minutes',
+      { ...validInput, daytimeMinutes: 45.7 },
+      'minutes',
+      'Minutes must be between 0 and 600.',
+    ],
+    [
+      'type-confused minutes (boolean)',
+      { ...validInput, daytimeMinutes: true },
+      'minutes',
+      'Minutes must be between 0 and 600.',
+    ],
   ];
 
   it.each(cases)('rejects %s', async (_label, input, field, message) => {
@@ -209,6 +227,15 @@ describe('updateTrip', () => {
       fields: { minutes: 'Minutes must be between 0 and 600.' },
     });
     expect(setMock).not.toHaveBeenCalled();
+  });
+
+  it('throws NotFoundError if the row vanishes between the ownership check and the write', async () => {
+    whereMock.mockResolvedValueOnce([{ id: 10 }]); // owned at check time
+    updateReturningMock.mockResolvedValue([]); // deleted before the write lands
+
+    await expect(
+      updateTrip(10, validInput, { studentId: 5 })
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 });
 

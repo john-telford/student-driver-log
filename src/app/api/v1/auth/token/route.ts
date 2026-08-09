@@ -20,9 +20,9 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  // Guard against non-object bodies (e.g. a literal `null`, which parses fine
-  // but would throw on property access).
-  if (typeof body !== 'object' || body === null) {
+  // Guard against non-object bodies (e.g. a literal `null` or an array, which
+  // parse fine but are not a valid credentials object).
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
     return withCors(
       request,
       Response.json(
@@ -56,7 +56,11 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const token = await issueApiToken(user);
-  return withCors(request, Response.json({ token }));
+  // Never let an intermediary/proxy cache a bearer credential.
+  return withCors(
+    request,
+    Response.json({ token }, { headers: { 'Cache-Control': 'no-store' } })
+  );
 }
 
 export async function OPTIONS(request: Request): Promise<Response> {

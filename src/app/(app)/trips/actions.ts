@@ -71,11 +71,12 @@ export async function updateTripAction(
   const studentId = await resolveStudentId(userId, userType);
   if (!studentId) return { errors: { form: 'No student selected.' } };
 
-  // Clamp minutes to 0–600 as input normalization (matches createTripAction's
-  // pattern from story 1.3), then delegate ownership check + validation +
-  // update to the shared service.
-  const daytimeMinutes = Math.max(0, Math.min(600, Number(formData.get('daytimeMinutes') ?? 0)));
-  const nighttimeMinutes = Math.max(0, Math.min(600, Number(formData.get('nighttimeMinutes') ?? 0)));
+  // Clamp + round minutes to a whole 0–600 as input normalization (matches
+  // createTripAction's pattern from story 1.3; rounding keeps the service's
+  // whole-minute rule from ever firing on the web), then delegate ownership
+  // check + validation + update to the shared service.
+  const daytimeMinutes = Math.round(Math.max(0, Math.min(600, Number(formData.get('daytimeMinutes') ?? 0))));
+  const nighttimeMinutes = Math.round(Math.max(0, Math.min(600, Number(formData.get('nighttimeMinutes') ?? 0))));
 
   try {
     await updateTrip(
