@@ -160,3 +160,22 @@ export async function updateTrip(
     .returning();
   return updated;
 }
+
+export async function deleteTrip(
+  tripId: number,
+  ctx: { studentId: number }
+): Promise<void> {
+  // Ownership check first (same pattern as updateTrip) — a non-owned trip
+  // throws NotFoundError rather than silently deleting 0 rows, so the API can
+  // report a visible 404 (NFR2). The web wrapper swallows this error to
+  // preserve its existing silent-no-op behavior; see actions.ts.
+  const [existing] = await db
+    .select({ id: trips.id })
+    .from(trips)
+    .where(and(eq(trips.id, tripId), eq(trips.studentId, ctx.studentId)));
+  if (!existing) {
+    throw new NotFoundError('Trip not found.');
+  }
+
+  await db.delete(trips).where(eq(trips.id, tripId));
+}

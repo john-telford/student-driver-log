@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the drizzle query chains:
 //   select().from().where().orderBy()      -> rows   (listTrips)
-//   select().from().where()  [awaited]      -> rows   (updateTrip ownership check)
+//   select().from().where()  [awaited]      -> rows   (updateTrip/deleteTrip ownership check)
 //   insert().values().returning()           -> [row]  (createTrip)
 //   update().set().where().returning()      -> [row]  (updateTrip)
+//   delete().where()         [awaited]      -> void   (deleteTrip)
 const orderByMock = vi.fn();
 // Default: supports the listTrips chain (`.where(...).orderBy(...)`). Tests
 // that need the ownership-check shape (`await .where(...)` directly) override
@@ -18,15 +19,17 @@ const valuesMock = vi.fn(() => ({ returning: returningMock }));
 const updateReturningMock = vi.fn();
 const updateWhereMock = vi.fn(() => ({ returning: updateReturningMock }));
 const setMock = vi.fn(() => ({ where: updateWhereMock }));
+const deleteWhereMock = vi.fn();
 vi.mock('@/db', () => ({
   db: {
     select: () => ({ from: fromMock }),
     insert: () => ({ values: valuesMock }),
     update: () => ({ set: setMock }),
+    delete: () => ({ where: deleteWhereMock }),
   },
 }));
 
-import { listTrips, createTrip, updateTrip } from './trips';
+import { listTrips, createTrip, updateTrip, deleteTrip } from './trips';
 import { ValidationError, NotFoundError } from './errors';
 
 beforeEach(() => {
@@ -206,5 +209,24 @@ describe('updateTrip', () => {
       fields: { minutes: 'Minutes must be between 0 and 600.' },
     });
     expect(setMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('deleteTrip', () => {
+  it('deletes an owned trip', async () => {
+    whereMock.mockResolvedValueOnce([{ id: 10 }]); // ownership check finds it
+    deleteWhereMock.mockResolvedValue(undefined);
+
+    await expect(deleteTrip(10, { studentId: 5 })).resolves.toBeUndefined();
+    expect(deleteWhereMock).toHaveBeenCalledOnce();
+  });
+
+  it('throws NotFoundError for a non-owned/non-existent trip, without deleting', async () => {
+    whereMock.mockResolvedValueOnce([]); // ownership check finds nothing
+
+    await expect(deleteTrip(999, { studentId: 5 })).rejects.toBeInstanceOf(
+      NotFoundError
+    );
+    expect(deleteWhereMock).not.toHaveBeenCalled();
   });
 });

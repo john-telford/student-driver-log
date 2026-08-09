@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { trips, users, type UserType } from '@/db/schema';
+import { users, type UserType } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { updateTrip } from '@/services/trips';
+import { updateTrip, deleteTrip } from '@/services/trips';
 import { ValidationError, NotFoundError } from '@/services/errors';
 
 export type TripEditState = {
@@ -47,10 +47,14 @@ export async function deleteTripAction(tripId: number): Promise<void> {
   const studentId = await resolveStudentId(userId, userType);
   if (!studentId) return;
 
-  // Only delete if the trip actually belongs to this student (prevents spoofing)
-  await db
-    .delete(trips)
-    .where(and(eq(trips.id, tripId), eq(trips.studentId, studentId)));
+  try {
+    await deleteTrip(tripId, { studentId });
+  } catch (err) {
+    // Preserve the pre-refactor silent no-op: a non-owned/already-deleted
+    // trip id does not surface an error to the UI.
+    if (err instanceof NotFoundError) return;
+    throw err;
+  }
 }
 
 export async function updateTripAction(

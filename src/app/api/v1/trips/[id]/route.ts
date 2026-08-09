@@ -2,7 +2,7 @@ import { requireApiUser, resolveApiStudentId } from '@/lib/api-auth';
 import { errorResponse } from '@/lib/api-error';
 import { preflight, withCors } from '@/lib/cors';
 import { ValidationError } from '@/services/errors';
-import { updateTrip } from '@/services/trips';
+import { updateTrip, deleteTrip } from '@/services/trips';
 
 function parseTripId(id: string): number {
   const tripId = Number(id);
@@ -37,6 +37,24 @@ export async function PATCH(
       studentId,
     });
     return withCors(request, Response.json(trip));
+  } catch (err) {
+    return withCors(request, errorResponse(err));
+  }
+}
+
+// DELETE /api/v1/trips/:id — delete a trip I own. 204 No Content on success.
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<Response> {
+  try {
+    const caller = await requireApiUser(request);
+    const studentId = resolveApiStudentId(caller);
+    const { id } = await params;
+    const tripId = parseTripId(id);
+
+    await deleteTrip(tripId, { studentId });
+    return withCors(request, new Response(null, { status: 204 }));
   } catch (err) {
     return withCors(request, errorResponse(err));
   }
