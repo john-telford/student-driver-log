@@ -39,6 +39,10 @@ yarn-error.log*
 # local sqlite databases
 local.db
 test.db
+ci-build.db
+
+# database backups (may contain password hashes + PII — never commit)
+/backups/
 
 # vercel
 .vercel

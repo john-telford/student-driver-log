@@ -1,9 +1,6 @@
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
-import { db } from '@/db';
-import { users } from '@/db/schema';
+import { verifyCredentials } from '@/services/auth';
 
 // Extend next-auth types to carry userType and parentId through the session
 declare module 'next-auth' {
@@ -31,25 +28,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, credentials.email as string));
-
+        const user = await verifyCredentials({
+          email: credentials.email as string,
+          password: credentials.password as string,
+        });
         if (!user) return null;
-
-        const valid = await bcrypt.compare(
-          credentials.password as string,
-          user.passwordHash
-        );
-        if (!valid) return null;
 
         return {
           id: String(user.id),
           name: user.name,
           email: user.email,
           userType: user.userType,
-          parentId: user.parentId ?? null,
+          parentId: user.parentId,
         };
       },
     }),
