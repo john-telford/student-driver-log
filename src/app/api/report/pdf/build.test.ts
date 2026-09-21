@@ -11,7 +11,7 @@ vi.mock('@/db', () => ({
 // Don't actually render PDF bytes in unit tests — assert on the call instead.
 // vi.mock factories are hoisted above imports, so the mock fn must be too.
 const { renderToBufferMock } = vi.hoisted(() => ({
-  renderToBufferMock: vi.fn(async () => Buffer.from('fake-pdf-bytes')),
+  renderToBufferMock: vi.fn<(element: unknown) => Promise<Buffer>>(async () => Buffer.from('fake-pdf-bytes')),
 }));
 vi.mock('@react-pdf/renderer', () => ({ renderToBuffer: renderToBufferMock }));
 vi.mock('./document', () => ({ ReportDocument: () => null }));
