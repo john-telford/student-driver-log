@@ -1,11 +1,12 @@
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { trips, users, type UserType } from '@/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { resolveSelectedStudentId } from '../actions';
 import ReportActions from './print-button';
 import { formatHMM } from '@/lib/utils';
+import { withRunningTotals } from '@/lib/running-totals';
 
 const locationLabels: Record<string, string> = {
   highway:     'Highway',
@@ -57,21 +58,10 @@ export default async function ReportPage() {
     .select()
     .from(trips)
     .where(eq(trips.studentId, studentId))
-    .orderBy(desc(trips.tripDate), desc(trips.id));
+    // Oldest first, exactly like the PDF: running totals accrue forward in time.
+    .orderBy(trips.tripDate, trips.id);
 
-  // Build rows with running totals
-  let runningDay = 0;
-  let runningNight = 0;
-  const rows = tripRows.map((trip) => {
-    runningDay += trip.daytimeMinutes;
-    runningNight += trip.nighttimeMinutes;
-    return {
-      ...trip,
-      runningDay,
-      runningNight,
-      grandTotal: runningDay + runningNight,
-    };
-  });
+  const { rows, totalDay, totalNight } = withRunningTotals(tripRows);
 
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -154,11 +144,11 @@ export default async function ReportPage() {
                   <td colSpan={3} className="border border-border px-2 py-2 text-right uppercase tracking-wider text-xs print:border-black">
                     Totals
                   </td>
-                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(runningDay)}</td>
+                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(totalDay)}</td>
                   <td className="border border-border px-2 py-2 text-center print:border-black" />
-                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(runningNight)}</td>
+                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(totalNight)}</td>
                   <td className="border border-border px-2 py-2 text-center print:border-black" />
-                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(runningDay + runningNight)}</td>
+                  <td className="border border-border px-2 py-2 text-center tabular-nums print:border-black">{formatHMM(totalDay + totalNight)}</td>
                   <td className="border border-border px-2 py-2 print:border-black" />
                 </tr>
               </tbody>
