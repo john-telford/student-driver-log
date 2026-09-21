@@ -191,6 +191,7 @@ JSON (or map thrown typed errors to HTTP status).
 | Method & path | Service call | Notes |
 |---|---|---|
 | `POST /api/v1/auth/token` | `verifyCredentials` | Returns `{ token }`. No auth required. |
+| `GET  /api/v1/me` | `getUserProfile` | Caller's own `{ id, name, email, userType }`. Works for parent tokens (no `resolveApiStudentId`). `401` if the user row is gone. `Cache-Control: no-store`. |
 | `GET  /api/v1/trips` | `listTrips` | Trips for the resolved student, newest first. |
 | `POST /api/v1/trips` | `createTrip` | JSON body (not FormData). Returns created trip. |
 | `PATCH /api/v1/trips/:id` | `updateTrip` | Ownership enforced in service. |

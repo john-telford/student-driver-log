@@ -86,7 +86,8 @@ Set these in `.env.local` (all config is env-based; nothing is committed):
 
 `/api/v1` is a small Bearer-authenticated surface for the native iOS client. Exchange
 credentials for a token at `POST /api/v1/auth/token`, then send `Authorization: Bearer <jwt>`.
-Endpoints cover trips (list/create/update/delete), the progress report, and PDF export. The
+Endpoints cover the caller's identity (`GET /api/v1/me` → `{ id, name, email, userType }`, valid for
+student and parent tokens), trips (list/create/update/delete), the progress report, and PDF export. The
 full contract lives with the route handlers in [src/app/api/v1/](src/app/api/v1/).
 
 > **iOS clients must use the `www` host.** The apex domain 301-redirects to `www` and the
