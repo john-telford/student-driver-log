@@ -2,6 +2,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { db } from '@/db';
 import { trips } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { withRunningTotals } from '@/lib/running-totals';
 import { ReportDocument } from './document';
 
 // Shared by the web PDF route (session-cookie auth) and the `/api/v1/report/pdf`
@@ -18,13 +19,7 @@ export async function buildReportPdf(
     .where(eq(trips.studentId, studentId))
     .orderBy(trips.tripDate, trips.id);
 
-  let runningDay = 0;
-  let runningNight = 0;
-  const rows = tripRows.map((trip) => {
-    runningDay += trip.daytimeMinutes;
-    runningNight += trip.nighttimeMinutes;
-    return { ...trip, runningDay, runningNight, grandTotal: runningDay + runningNight };
-  });
+  const { rows, totalDay, totalNight } = withRunningTotals(tripRows);
 
   const printedDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -35,8 +30,8 @@ export async function buildReportPdf(
       rows={rows}
       studentName={studentName}
       parentName={parentName}
-      totalDay={runningDay}
-      totalNight={runningNight}
+      totalDay={totalDay}
+      totalNight={totalNight}
       printedDate={printedDate}
     />
   );
