@@ -1,0 +1,65 @@
+:root{
+  /* ── Base palette ─────────────────────────────────────────────
+     Interstate green — Pantone 342 / FHWA guide-sign standard (#006B3C)
+     Highway yellow  — FHWA warning-sign yellow (#FFCD00) */
+  --green-sign:        oklch(0.44 0.16 148);   /* #006B3C */
+  --green-deep:        oklch(0.32 0.12 148);   /* nav / sidebar */
+  --green-text:        oklch(0.38 0.15 148);   /* body copy */
+  --green-mid:         oklch(0.52 0.16 148);
+  --green-light:       oklch(0.62 0.14 148);
+  --green-pale:        oklch(0.72 0.11 148);
+  --green-rule:        oklch(0.60 0.08 148);   /* sign-panel border */
+  --yellow-highway:    oklch(0.88 0.18 89);    /* #FFCD00 */
+  --red-traffic:       oklch(0.55 0.22 25);
+  --white:             oklch(1 0 0);
+  --ink:               oklch(0.15 0 0);
+  --gray-panel:        oklch(0.88 0.006 148);
+  --gray-line:         oklch(0.82 0.02 148);
+  --gray-text:         oklch(0.52 0.08 148);
+
+  /* ── Semantic aliases (names match the product's globals.css) ── */
+  --primary:            var(--green-sign);
+  --primary-foreground: var(--white);
+  --accent:             var(--yellow-highway);
+  --accent-foreground:  var(--ink);
+  --secondary:            var(--green-deep);
+  --secondary-foreground: var(--white);
+
+  --background:         var(--white);
+  --foreground:         var(--green-text);
+  --card:               var(--white);
+  --card-foreground:    var(--green-text);
+  --popover:            var(--white);
+  --popover-foreground: var(--green-text);
+
+  --muted:            var(--gray-panel);
+  --muted-foreground: var(--gray-text);
+  --border: var(--gray-line);
+  --input:  var(--gray-line);
+  --ring:   var(--green-sign);
+  --destructive: var(--red-traffic);
+
+  /* ── Progress / chart ramp (green ramp, yellow tail) ── */
+  --chart-1: var(--green-sign);
+  --chart-2: var(--green-mid);
+  --chart-3: var(--green-light);
+  --chart-4: var(--green-pale);
+  --chart-5: var(--yellow-highway);
+
+  /* ── Sidebar / nav surface ── */
+  --sidebar:                    var(--green-deep);
+  --sidebar-foreground:         var(--white);
+  --sidebar-primary:            var(--green-sign);
+  --sidebar-primary-foreground: var(--white);
+  --sidebar-accent:             var(--yellow-highway);
+  --sidebar-accent-foreground:  var(--ink);
+  --sidebar-border:             oklch(0.36 0.12 148);
+  --sidebar-ring:               var(--green-sign);
+
+  /* ── On-green text tiers (used on sign panels and the app header) ── */
+  --on-green-primary:   var(--white);
+  --on-green-secondary: oklch(1 0 0 / 80%);
+  --on-green-tertiary:  oklch(1 0 0 / 60%);
+  --on-green-faint:     oklch(1 0 0 / 30%);
+  --on-green-rule:      oklch(1 0 0 / 30%);
+}

@@ -1,0 +1,24 @@
+:root{
+  /* 4px base scale (Tailwind default), as used across the product */
+  --space-0: 0px;
+  --space-px: 1px;
+  --space-1: 4px;
+  --space-1-5: 6px;   /* sign-card reflective frame padding */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;    /* page gutter */
+  --space-5: 20px;
+  --space-6: 24px;    /* card padding */
+  --space-7: 28px;
+  --space-8: 32px;    /* section gap */
+  --space-12: 48px;   /* public page vertical padding */
+
+  /* Layout */
+  --header-height: 56px;      /* h-14 */
+  --header-accent-rule: 4px;  /* yellow border under the green header */
+  --content-max-app: 896px;   /* max-w-4xl */
+  --content-max-public: 768px;/* max-w-3xl */
+  --content-max-auth: 384px;  /* max-w-sm */
+  --gutter: var(--space-4);
+  --gutter-public: var(--space-6);
+}

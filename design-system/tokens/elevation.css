@@ -1,0 +1,8 @@
+:root{
+  /* The only shadows in the product: a soft green cast under sign cards. */
+  --shadow-sign: 0 8px 32px oklch(0.36 0.12 152 / 25%);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 10%), 0 4px 6px -4px oklch(0 0 0 / 10%);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 10%), 0 2px 4px -2px oklch(0 0 0 / 10%);
+  --shadow-ring-hairline: inset 0 0 0 1px oklch(0.38 0.15 148 / 10%);  /* shadcn Card ring-foreground/10 */
+  --focus-ring: 0 0 0 3px oklch(0.44 0.16 148 / 50%); /* @kind shadow */
+}

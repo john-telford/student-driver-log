@@ -1,0 +1,45 @@
+:root{
+  --font-sans: 'Overpass', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Overpass Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Weights — the product uses 400 body, 600/700 emphasis, 800/900 for the
+     uppercase "sign" voice (Tailwind font-black). */
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --weight-black: 900;
+
+  /* Sizes: literal values as they appear in the product */
+  --text-micro: 10px;   /* legal / footer / eyebrow labels */
+  --text-2xs: 11px;     /* form labels on green panels */
+  --text-xs: 12px;      /* table headers, meta, buttons */
+  --text-sm: 14px;      /* body copy, inputs, table cells */
+  --text-base: 16px;
+  --text-lg: 18px;      /* report heading */
+  --text-xl: 20px;      /* page title (h1) */
+  --text-2xl: 24px;     /* auth + public page title */
+  --text-4xl: 36px;
+  --text-8xl: 96px;     /* 404 numeral */
+
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Letter-spacing — the highway-sign voice lives here */
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0em;
+  --tracking-sign: 0.04em;    /* .sign-panel */
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+  --tracking-eyebrow: 0.2em;  /* auth sub-labels */
+
+  /* Semantic roles */
+  --text-title: var(--weight-black) var(--text-xl)/var(--leading-tight) var(--font-sans);
+  --text-body: var(--weight-regular) var(--text-sm)/var(--leading-relaxed) var(--font-sans);
+  --text-label: var(--weight-bold) var(--text-xs)/var(--leading-tight) var(--font-sans);
+  --text-numeric: var(--weight-black) var(--text-2xl)/var(--leading-tight) var(--font-sans);
+}
