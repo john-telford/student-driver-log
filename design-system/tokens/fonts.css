@@ -1,0 +1,5 @@
+/* Overpass — the open-source recreation of Highway Gothic (FHWA Series E Modified).
+   The product loads these via next/font/google (weights 400,600,700,800 + mono 400,600).
+   No local binaries exist in the source repo, so the design system links the same
+   Google Fonts CDN faces. Substitute self-hosted files here if they are ever added. */
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800;900&family=Overpass+Mono:wght@400;600&display=swap');

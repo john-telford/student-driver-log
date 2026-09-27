@@ -1,0 +1,27 @@
+<!-- @dsCard group="iOS" viewport="900x700" name="iOS — Installed Home-Screen App" subtitle="The standalone PWA on iPhone: sign-in sign card, dashboard, log trip" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Student Driver Log — iOS UI Kit</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>html,body{margin:0;height:100%}body{font-family:var(--font-sans);color:var(--foreground);background:oklch(0.96 0.005 148);display:flex;align-items:center;justify-content:center;gap:48px;padding:32px;box-sizing:border-box}a{color:var(--primary)}a:hover{opacity:.7}.note{max-width:280px;font-size:13px;line-height:1.6;color:var(--muted-foreground)}.note h2{font:900 14px/1.2 var(--font-sans);text-transform:uppercase;letter-spacing:.1em;color:var(--primary);margin:0 0 10px}.note code{font-family:var(--font-mono);font-size:11px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head>
+<body>
+<div class="note">
+  <h2>Installed, not native</h2>
+  <p>There is no iOS client codebase yet — the architecture doc scopes it as a later effort. What ships on iPhone today is the same web app added to the home screen: <code>display: standalone</code>, portrait, theme colour <code>#006B3C</code>, launched from the steering-wheel icon.</p>
+  <p>So this kit is the phone-width layout of the real screens, not a new design: the green bar keeps its yellow rule, the hamburger is the app's own 2.5px glyph, and the nine-column report defers to the PDF route.</p>
+</div>
+<div id="root"></div>
+<script type="text/babel" src="../web/data.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="MobileApp.jsx"></script>
+<script type="text/babel">
+const { IOSDevice } = window;
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <IOSDevice width={380} height={620}><MobileApp /></IOSDevice>
+);
+</script>
+</body></html>

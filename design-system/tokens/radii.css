@@ -1,0 +1,19 @@
+:root{
+  --radius: 0.5rem;                          /* 8px — highway sign corner rounding */
+  --radius-sm: calc(var(--radius) * 0.6);    /* 4.8px */
+  --radius-md: calc(var(--radius) * 0.8);    /* 6.4px */
+  --radius-lg: var(--radius);                /* 8px */
+  --radius-xl: calc(var(--radius) * 1.4);    /* 11.2px */
+  --radius-2xl: calc(var(--radius) * 1.8);   /* 14.4px */
+  --radius-3xl: calc(var(--radius) * 2.2);   /* 17.6px — auth sign frame */
+  --radius-4xl: calc(var(--radius) * 2.6);   /* 20.8px */
+  --radius-panel: 1.2rem;                    /* inner green auth panel */
+  --radius-control: 4px;                    /* buttons, inputs (Tailwind `rounded`) */
+  --radius-chip: 4px;                        /* .sign-panel badge */
+  --radius-pill: 9999px;                     /* progress bars */
+
+  /* Borders */
+  --border-hairline: 1px;
+  --border-frame: 3px;   /* black outer frame on auth sign cards */
+  --border-rule: 4px;    /* yellow accent rule under header */
+}

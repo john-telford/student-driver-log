@@ -103,3 +103,19 @@ full contract lives with the route handlers in [src/app/api/v1/](src/app/api/v1/
 - Minutes are stored as integers (0–600 per field), displayed as `H:MM`.
 
 See [SPEC.md](SPEC.md) for the full requirements and validation rules.
+
+## Design system
+
+[design-system/](design-system/) is the brand and UI guide (colour, type, spacing, components, voice),
+exported from claude.ai Design and committed verbatim so it is versioned with the code. It is not
+part of the app build. Replace the folder wholesale when re-exporting so the diff shows what changed.
+
+External tools (e.g. an ElevenLabs knowledge base) can read it from raw GitHub URLs:
+
+| File | What it is |
+|---|---|
+| [`readme.md`](https://raw.githubusercontent.com/john-telford/student-driver-log/main/design-system/readme.md) | The design guide — voice, visual foundations, iconography. Start here. |
+| [`SKILL.md`](https://raw.githubusercontent.com/john-telford/student-driver-log/main/design-system/SKILL.md) | Agent entry point and non-negotiables |
+| [`tokens/colors.css`](https://raw.githubusercontent.com/john-telford/student-driver-log/main/design-system/tokens/colors.css) | Colour tokens (other tokens sit alongside in `tokens/`) |
+
+These URLs track `main`. Swap `main` for a tag or commit SHA to pin a snapshot.
