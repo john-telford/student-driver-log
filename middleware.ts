@@ -14,8 +14,8 @@ export const config = {
      * - _next/static, _next/image (Next.js internals)
      * - favicon.ico
      * - /login, /register, /forgot-password, /reset-password (public auth pages)
-     * - /about, /privacy, /terms, /faq (public info pages)
+     * - /about, /privacy, /terms, /faq, /brand (public info pages)
      */
-    '/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|icon|apple-icon|login|register|forgot-password|reset-password|about|privacy|terms|faq).*)',
+    '/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|icon|apple-icon|login|register|forgot-password|reset-password|about|privacy|terms|faq|brand).*)',
   ],
 };
