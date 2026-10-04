@@ -8,8 +8,9 @@ import { fileURLToPath } from 'node:url';
 vi.hoisted(() => {
   process.env.DATABASE_URL = ':memory:';
 });
+const session = vi.hoisted(() => ({ user: { id: '1', userType: 'parent' } }));
 vi.mock('@/auth', () => ({
-  auth: async () => ({ user: { id: '1', userType: 'parent' } }),
+  auth: async () => session,
   signOut: vi.fn(async () => undefined),
 }));
 
@@ -22,6 +23,8 @@ import { deleteAccountAction } from './actions';
 const trip = { tripDate: '2026-08-01', locationType: 'residential', weather: 'clear', daytimeMinutes: 30 } as const;
 
 beforeAll(async () => {
+  // This test migrates and deletes; never let it run against a real database.
+  if (process.env.DATABASE_URL !== ':memory:') throw new Error('refusing to run against a real database');
   await migrate(db, { migrationsFolder: fileURLToPath(new URL('../../../../drizzle', import.meta.url)) });
   await db.insert(users).values([
     { id: 1, email: 'p@example.com', passwordHash: 'x', name: 'Parent', userType: 'parent' },
@@ -43,6 +46,19 @@ describe('deleteAccountAction', () => {
     const form = new FormData();
     form.set('confirm', 'delete');
     expect(await deleteAccountAction(undefined, form)).toEqual({ error: 'Type DELETE exactly to confirm.' });
+    expect(await db.select().from(users)).toHaveLength(5);
+  });
+
+  // The copy says only a parent deletes accounts; a student session must not.
+  it('refuses a student session', async () => {
+    session.user = { id: '2', userType: 'student' };
+    const form = new FormData();
+    form.set('confirm', 'DELETE');
+    try {
+      expect(await deleteAccountAction(undefined, form)).toEqual({ error: 'Not authorized.' });
+    } finally {
+      session.user = { id: '1', userType: 'parent' };
+    }
     expect(await db.select().from(users)).toHaveLength(5);
   });
 

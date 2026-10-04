@@ -29,8 +29,12 @@ test('/faq and /about no longer say there is no App Store app', async ({ page })
   }
 });
 
-test('the public footer links to /support', async ({ page }) => {
-  await page.goto('/about');
-  await page.locator('footer').getByRole('link', { name: 'Support' }).click();
-  await expect(page).toHaveURL('/support');
-});
+// /login is App Review's first screen; its footer links are a plain div, not
+// a <footer>, so find the one Support link by role on each page.
+for (const path of ['/about', '/login']) {
+  test(`${path} links to /support`, async ({ page }) => {
+    await page.goto(path);
+    await page.getByRole('link', { name: 'Support', exact: true }).click();
+    await expect(page).toHaveURL('/support');
+  });
+}
