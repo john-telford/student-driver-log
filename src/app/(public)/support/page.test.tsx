@@ -19,7 +19,9 @@ describe('SupportPage', () => {
 
   it('covers both the website and the iOS app, and where deletion happens', () => {
     expect(html).toContain('Teen Driver Log');
-    expect(html).toContain('Settings → Delete Account');
-    expect(html).toContain('The iOS app has no delete option.');
+    expect(html).toContain('Settings → Danger Zone');
+    expect(html).toContain('Delete My Account');
+    expect(html).toContain('A student account cannot be deleted on its own');
+    expect(html).toContain('The iOS app cannot delete an account.');
   });
 });

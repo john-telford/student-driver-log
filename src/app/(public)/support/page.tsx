@@ -46,11 +46,12 @@ export default function SupportPage() {
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Deleting your account</h2>
         <p>
-          Accounts are deleted on the website by the parent or guardian. Sign in to the parent
-          account, go to <span className="font-bold">Settings → Delete Account</span>, type DELETE
+          A parent or guardian deletes their account on the website. Sign in to the parent
+          account, go to <span className="font-bold">Settings → Danger Zone</span>, type DELETE
           to confirm, and choose <span className="font-bold">Delete My Account</span>. This also
           deletes all of its student accounts and every driving session, and it cannot be
-          undone. The iOS app has no delete option.
+          undone. A student account cannot be deleted on its own; it is deleted with the parent
+          account it belongs to. The iOS app cannot delete an account.
         </p>
       </section>
 

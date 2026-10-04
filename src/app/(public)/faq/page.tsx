@@ -156,8 +156,8 @@ export default function FaqPage() {
             className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
           >
             open an issue on GitHub
-          </a>
-          .
+          </a>{' '}
+          (issues are public, so please do not post personal information in one).
         </p>
       </section>
 

@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           <li><span className="font-bold">Driving sessions</span> — date, duration (day/night minutes), location type, weather conditions, and optional notes that you enter.</li>
           <li><span className="font-bold">Student accounts</span> — names and emails of student accounts you create as a parent.</li>
           <li><span className="font-bold">Session cookies</span> — on the website, used to keep you logged in (8-hour expiry). A separate cookie remembers which student account you last selected.</li>
-          <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. It keeps your sign-in in the iOS Keychain on your device instead of cookies.</li>
+          <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. It stores your email, password and an access token in the iOS Keychain on your device (instead of cookies), and remembers the last email you used to prefill sign-in. Your email and password are sent only to sign in; the access token, which identifies your account (your account ID), goes with every request to our server.</li>
         </ul>
       </section>
 
@@ -76,13 +76,13 @@ export default function PrivacyPage() {
         <p>
           Your data is kept for as long as your account exists. A parent or guardian can
           permanently delete their account on the website: sign in to the parent account and go
-          to <span className="font-bold">Settings → Delete Account</span>. Deleting a parent
+          to <span className="font-bold">Settings → Danger Zone → Delete My Account</span>. Deleting a parent
           account also deletes all of its student accounts and every driving session. Deletion is
           immediate and irreversible.
         </p>
         <p>
-          The iOS app has no delete option. Accounts, including student accounts, are deleted on
-          the website by the parent or guardian.
+          The iOS app cannot delete an account. A student account cannot be deleted on its own; it
+          is deleted with the parent account it belongs to.
         </p>
       </section>
 
@@ -104,8 +104,8 @@ export default function PrivacyPage() {
             className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
           >
             open an issue on GitHub
-          </a>
-          . This app is governed by the laws of the State of Illinois, USA.
+          </a>{' '}
+          (issues are public, so please do not post personal information in one). This app is governed by the laws of the State of Illinois, USA.
         </p>
       </section>
 
