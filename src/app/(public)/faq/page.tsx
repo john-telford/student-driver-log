@@ -22,11 +22,27 @@ export default function FaqPage() {
         <p className="text-black/40 text-xs uppercase tracking-widest">Frequently Asked Questions</p>
       </div>
 
+      {/* ── iOS app ── */}
+      <section className="space-y-3">
+        <Q>Is there an iPhone app?</Q>
+        <A>
+          <p>
+            Yes. An iPhone and iPad app, <span className="font-bold">Teen Driver Log</span>, is
+            coming to the App Store. On your home screen the app is named Driver Log.
+          </p>
+          <p>
+            The app is for students. A parent or guardian creates the student account here on
+            the website, and the student signs in to the app with it. Parent accounts are managed
+            on the website.
+          </p>
+        </A>
+      </section>
+
       {/* ── iOS home screen ── */}
       <section className="space-y-3">
-        <Q>How do I add this to my iPhone home screen?</Q>
+        <Q>How do I add the website to my iPhone home screen?</Q>
         <A>
-          <p>Student Driver Log works as an installable app on iOS — no App Store required.</p>
+          <p>The website also works as an installable app on iOS, straight from Safari.</p>
           <ol className="space-y-1 list-decimal list-inside">
             <li>Open <span className="font-bold">studentdriver.site</span> in Safari (must be Safari, not Chrome).</li>
             <li>Tap the <span className="font-bold">Share</span> button at the bottom of the screen (the box with an arrow pointing up).</li>
@@ -121,14 +137,25 @@ export default function FaqPage() {
       {/* ── Still have questions ── */}
       <section className="pt-4 border-t border-black/10 space-y-2">
         <p className="text-sm text-black/60">
-          Still have a question?{' '}
+          Still have a question? Email{' '}
+          <a
+            href="mailto:support@studentdriver.site"
+            className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
+          >
+            support@studentdriver.site
+          </a>
+          , see{' '}
+          <Link href="/support" className="text-primary font-bold underline underline-offset-2 hover:opacity-70">
+            Support
+          </Link>
+          , or{' '}
           <a
             href="https://github.com/john-telford/student-driver-log"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
           >
-            Open an issue on GitHub
+            open an issue on GitHub
           </a>
           .
         </p>

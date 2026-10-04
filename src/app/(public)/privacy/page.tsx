@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Privacy Policy — Student Driver Log',
 };
 
-const EFFECTIVE_DATE = 'April 27, 2026';
+const EFFECTIVE_DATE = 'October 4, 2026';
 
 export default function PrivacyPage() {
   return (
@@ -20,6 +20,12 @@ export default function PrivacyPage() {
         how it's used, and what your options are. Plain English throughout.
       </p>
 
+      <p>
+        It covers both the website (studentdriver.site) and the iOS app,{' '}
+        <span className="font-bold">Teen Driver Log</span> (on your home screen the app is named
+        Driver Log). Both use the same accounts and store data in the same place.
+      </p>
+
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">What we collect</h2>
         <ul className="space-y-2">
@@ -27,14 +33,15 @@ export default function PrivacyPage() {
           <li><span className="font-bold">Password</span> — stored as a one-way hash (bcrypt). We cannot read your password.</li>
           <li><span className="font-bold">Driving sessions</span> — date, duration (day/night minutes), location type, weather conditions, and optional notes that you enter.</li>
           <li><span className="font-bold">Student accounts</span> — names and emails of student accounts you create as a parent.</li>
-          <li><span className="font-bold">Session cookies</span> — used to keep you logged in (8-hour expiry). A separate cookie remembers which student account you last selected.</li>
+          <li><span className="font-bold">Session cookies</span> — on the website, used to keep you logged in (8-hour expiry). A separate cookie remembers which student account you last selected.</li>
+          <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. It keeps your sign-in in the iOS Keychain on your device instead of cookies.</li>
         </ul>
       </section>
 
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Analytics</h2>
         <p>
-          This site uses <span className="font-bold">Google Analytics 4</span> to understand aggregate
+          The website uses <span className="font-bold">Google Analytics 4</span> to understand aggregate
           usage patterns (page views, general traffic). Google Analytics collects your IP address and
           browser information. You can opt out using the{' '}
           <a
@@ -47,11 +54,15 @@ export default function PrivacyPage() {
           </a>
           .
         </p>
+        <p>
+          The iOS app contains <span className="font-bold">no analytics and no tracking</span> — no
+          Google Analytics and no other analytics, advertising or tracking code.
+        </p>
       </section>
 
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Third-party services</h2>
-        <p>Your data passes through these services to run the app:</p>
+        <p>Your data passes through these services to run the website and the iOS app:</p>
         <ul className="space-y-2">
           <li><span className="font-bold">Vercel</span> — hosting and serving the application.</li>
           <li><span className="font-bold">Turso</span> — the database where your account and driving log data is stored.</li>
@@ -63,17 +74,29 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Data retention & deletion</h2>
         <p>
-          Your data is kept for as long as your account exists. You can permanently delete your
-          account — including all student accounts and every driving session — from{' '}
-          <span className="font-bold">Settings → Delete Account</span> inside the app. Deletion is
+          Your data is kept for as long as your account exists. A parent or guardian can
+          permanently delete their account on the website: sign in to the parent account and go
+          to <span className="font-bold">Settings → Delete Account</span>. Deleting a parent
+          account also deletes all of its student accounts and every driving session. Deletion is
           immediate and irreversible.
+        </p>
+        <p>
+          The iOS app has no delete option. Accounts, including student accounts, are deleted on
+          the website by the parent or guardian.
         </p>
       </section>
 
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Questions</h2>
         <p>
-          For privacy-related questions or requests,{' '}
+          For privacy-related questions or requests, email{' '}
+          <a
+            href="mailto:support@studentdriver.site"
+            className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
+          >
+            support@studentdriver.site
+          </a>{' '}
+          or{' '}
           <a
             href="https://github.com/john-telford/student-driver-log"
             target="_blank"
