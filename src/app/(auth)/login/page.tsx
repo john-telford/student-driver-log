@@ -131,6 +131,7 @@ export default function LoginPage() {
               <Link href="/privacy" className="hover:text-white/60">Privacy</Link>
               <Link href="/terms" className="hover:text-white/60">Terms</Link>
               <Link href="/faq" className="hover:text-white/60">FAQ</Link>
+              <Link href="/support" className="hover:text-white/60">Support</Link>
             </div>
             {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
               <p className="text-center text-[10px] text-white/20 font-mono">
