@@ -2,9 +2,10 @@ import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { fileURLToPath } from 'node:url';
 
 // The privacy policy and /support promise that deleting a parent account also
-// deletes its student accounts and every driving session. That rests on the
-// ON DELETE CASCADE foreign keys in the schema, so exercise it for real
-// against an in-memory DB; only the session and the redirect are stubbed.
+// deletes its student accounts and every driving session. The action's
+// explicit deletes carry that promise; the ON DELETE CASCADE foreign keys are
+// the backup. Exercise it for real against an in-memory DB; only the session
+// and the redirect are stubbed.
 vi.hoisted(() => {
   process.env.DATABASE_URL = ':memory:';
 });
@@ -62,7 +63,7 @@ describe('deleteAccountAction', () => {
     expect(await db.select().from(users)).toHaveLength(5);
   });
 
-  it("deletes the parent, its students, their trips and tokens, and nobody else's", async () => {
+  it("deletes the parent, its students, their trips and tokens, and nobody else's, with FKs on", async () => {
     const form = new FormData();
     form.set('confirm', 'DELETE');
     await deleteAccountAction(undefined, form);
@@ -107,6 +108,8 @@ describe('deleteAccountAction without relying on the cascade', () => {
 
     await db.run(sql`PRAGMA foreign_keys = OFF`);
     try {
+      // Guard: the test is only meaningful if FKs really are off here.
+      expect((await db.all<{ foreign_keys: number }>(sql`PRAGMA foreign_keys`))[0].foreign_keys).toBe(0);
       await asParent(10, () => deleteAccountAction(undefined, confirmed()));
     } finally {
       await db.run(sql`PRAGMA foreign_keys = ON`);
@@ -130,7 +133,7 @@ describe('deleteAccountAction without relying on the cascade', () => {
       "CREATE TRIGGER block_parent_30 BEFORE DELETE ON users WHEN old.id = 30 BEGIN SELECT RAISE(ABORT, 'blocked'); END",
     ));
     try {
-      await expect(asParent(30, () => deleteAccountAction(undefined, confirmed()))).rejects.toThrow();
+      await expect(asParent(30, () => deleteAccountAction(undefined, confirmed()))).rejects.toThrow(/blocked/);
     } finally {
       await db.run(sql`DROP TRIGGER block_parent_30`);
     }
