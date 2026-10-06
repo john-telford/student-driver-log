@@ -6,6 +6,8 @@ import SupportPage from './page';
 // the pointers to privacy and account deletion must not silently disappear.
 describe('SupportPage', () => {
   const html = renderToStaticMarkup(<SupportPage />);
+  // React escapes apostrophes; decode them so the copy can be matched verbatim.
+  const text = html.replaceAll('&#x27;', "'");
 
   it('links the support email', () => {
     expect(html).toContain('href="mailto:support@studentdriver.site"');
@@ -23,5 +25,12 @@ describe('SupportPage', () => {
     expect(html).toContain('Delete My Account');
     expect(html).toContain('A student account cannot be deleted on its own');
     expect(html).toContain('The iOS app cannot delete an account.');
+  });
+
+  // Decision 178's short form: immediate in the live database, not in backups.
+  it('says deletion is immediate in the live database, with backup copies on their own schedules', () => {
+    expect(text).toMatch(/from our live database immediately and can't be undone/);
+    expect(text).toMatch(/backups and logs are deleted on their own schedules/);
+    expect(text).not.toContain('cannot be undone');
   });
 });

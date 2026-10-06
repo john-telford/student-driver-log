@@ -49,9 +49,11 @@ export default function SupportPage() {
           A parent or guardian deletes their account on the website. Sign in to the parent
           account, go to <span className="font-bold">Settings → Danger Zone</span>, type DELETE
           to confirm, and choose <span className="font-bold">Delete My Account</span>. This also
-          deletes all of its student accounts and every driving session, and it cannot be
-          undone. A student account cannot be deleted on its own; it is deleted with the parent
-          account it belongs to. The iOS app cannot delete an account.
+          deletes all of its student accounts and every driving session. It removes your data
+          from our live database immediately and can&apos;t be undone; copies in our service
+          providers&apos; backups and logs are deleted on their own schedules. A student account
+          cannot be deleted on its own; it is deleted with the parent account it belongs to. The
+          iOS app cannot delete an account.
         </p>
       </section>
 
