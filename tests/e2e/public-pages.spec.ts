@@ -23,12 +23,14 @@ test('/privacy is public and covers the iOS app', async ({ page }) => {
   );
 });
 
-test('/faq and /about no longer say there is no App Store app', async ({ page }) => {
+test('/faq and /about point iPhone users to the App Store app, not a home-screen install', async ({ page }) => {
   for (const path of ['/faq', '/about']) {
     await page.goto(path);
     await expect(page).toHaveURL(path);
     await expect(page.locator('main')).toContainText('Teen Driver Log');
     await expect(page.locator('main')).not.toContainText(/no App Store required|without any app store/i);
+    // Decision 181: iPhone users get the iOS app, not the website's install pitch.
+    await expect(page.locator('main')).not.toContainText(/iPhone home screen|installable app on iOS|iOS and Android home screens/);
   }
 });
 

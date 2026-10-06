@@ -38,21 +38,6 @@ export default function FaqPage() {
         </A>
       </section>
 
-      {/* ── iOS home screen ── */}
-      <section className="space-y-3">
-        <Q>How do I add the website to my iPhone home screen?</Q>
-        <A>
-          <p>The website also works as an installable app on iOS, straight from Safari.</p>
-          <ol className="space-y-1 list-decimal list-inside">
-            <li>Open <span className="font-bold">studentdriver.site</span> in Safari (must be Safari, not Chrome).</li>
-            <li>Tap the <span className="font-bold">Share</span> button at the bottom of the screen (the box with an arrow pointing up).</li>
-            <li>Scroll down and tap <span className="font-bold">Add to Home Screen</span>.</li>
-            <li>Tap <span className="font-bold">Add</span> in the top right corner.</li>
-          </ol>
-          <p>The app icon will appear on your home screen and launch fullscreen — no browser chrome.</p>
-        </A>
-      </section>
-
       {/* ── Android home screen ── */}
       <section className="space-y-3">
         <Q>How do I add this to my Android home screen?</Q>
