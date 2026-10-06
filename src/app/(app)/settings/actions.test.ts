@@ -15,7 +15,7 @@ vi.mock('@/auth', () => ({
 }));
 
 import { migrate } from 'drizzle-orm/libsql/migrator';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { passwordResetTokens, trips, users } from '@/db/schema';
 import { deleteAccountAction } from './actions';
@@ -70,5 +70,73 @@ describe('deleteAccountAction', () => {
     expect((await db.select().from(users)).map((u) => u.id).sort()).toEqual([4, 5]);
     expect((await db.select().from(trips)).map((t) => t.studentId)).toEqual([5]);
     expect(await db.select().from(passwordResetTokens).where(eq(passwordResetTokens.userId, 2))).toEqual([]);
+  });
+});
+
+// Production FKs cascade, but the action deletes each table itself so the
+// policy holds even without them, and does it in one transaction.
+describe('deleteAccountAction without relying on the cascade', () => {
+  const confirmed = () => {
+    const form = new FormData();
+    form.set('confirm', 'DELETE');
+    return form;
+  };
+  const asParent = async (id: number, run: () => Promise<unknown>) => {
+    session.user = { id: String(id), userType: 'parent' };
+    try {
+      return await run();
+    } finally {
+      session.user = { id: '1', userType: 'parent' };
+    }
+  };
+
+  it('deletes tokens, trips, students and the parent explicitly with FK enforcement off', async () => {
+    await db.insert(users).values([
+      { id: 10, email: 'p10@example.com', passwordHash: 'x', name: 'Parent 10', userType: 'parent' },
+      { id: 11, email: 's11@example.com', passwordHash: 'x', name: 'Student 11', userType: 'student', parentId: 10 },
+      { id: 12, email: 's12@example.com', passwordHash: 'x', name: 'Student 12', userType: 'student', parentId: 10 },
+    ]);
+    await db.insert(trips).values([
+      { ...trip, studentId: 11, createdBy: 10 },
+      { ...trip, studentId: 12, createdBy: 12 },
+    ]);
+    await db.insert(passwordResetTokens).values([
+      { userId: 10, tokenHash: 'h10', expiresAt: '2099-01-01' },
+      { userId: 11, tokenHash: 'h11', expiresAt: '2099-01-01' },
+    ]);
+
+    await db.run(sql`PRAGMA foreign_keys = OFF`);
+    try {
+      await asParent(10, () => deleteAccountAction(undefined, confirmed()));
+    } finally {
+      await db.run(sql`PRAGMA foreign_keys = ON`);
+    }
+
+    expect((await db.select().from(users)).map((u) => u.id).sort()).toEqual([4, 5]);
+    expect((await db.select().from(trips)).map((t) => t.studentId)).toEqual([5]);
+    expect(await db.select().from(passwordResetTokens)).toEqual([]);
+  });
+
+  it('rolls back every delete when one fails', async () => {
+    await db.insert(users).values([
+      { id: 30, email: 'p30@example.com', passwordHash: 'x', name: 'Parent 30', userType: 'parent' },
+      { id: 31, email: 's31@example.com', passwordHash: 'x', name: 'Student 31', userType: 'student', parentId: 30 },
+    ]);
+    await db.insert(trips).values({ ...trip, studentId: 31, createdBy: 30 });
+    await db.insert(passwordResetTokens).values({ userId: 31, tokenHash: 'h31', expiresAt: '2099-01-01' });
+
+    // Fail the last statement (the parent row) after the children are gone.
+    await db.run(sql.raw(
+      "CREATE TRIGGER block_parent_30 BEFORE DELETE ON users WHEN old.id = 30 BEGIN SELECT RAISE(ABORT, 'blocked'); END",
+    ));
+    try {
+      await expect(asParent(30, () => deleteAccountAction(undefined, confirmed()))).rejects.toThrow();
+    } finally {
+      await db.run(sql`DROP TRIGGER block_parent_30`);
+    }
+
+    expect((await db.select().from(users)).map((u) => u.id).sort((a, b) => a - b)).toEqual([4, 5, 30, 31]);
+    expect((await db.select().from(trips)).map((t) => t.studentId).sort((a, b) => a - b)).toEqual([5, 31]);
+    expect((await db.select().from(passwordResetTokens)).map((t) => t.userId)).toEqual([31]);
   });
 });
