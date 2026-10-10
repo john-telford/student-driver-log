@@ -1,5 +1,10 @@
-// In-memory rate limiter — persists within a serverless instance lifetime.
-// Acceptable for a low-traffic personal app; not suitable for high-volume services.
+// In-memory sign-in limiter: 5 failed attempts per key per 15 minutes. Only
+// failures count; a success clears the key.
+//
+// The Map lives in the module, so on Vercel each function instance keeps its
+// own count and loses it on a cold start. An attacker spread across instances
+// gets more than 5 tries per window. That is acceptable for 1.0's traffic and
+// threat model; a shared store (e.g. Redis) is the upgrade if it ever is not.
 
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const MAX_FAILURES = 5;
@@ -18,6 +23,14 @@ export function isRateLimited(key: string): boolean {
   return entry.count >= MAX_FAILURES;
 }
 
+// Whole seconds until the key's window frees (for a Retry-After header);
+// 0 when the key is not limited.
+export function retryAfterSeconds(key: string): number {
+  const entry = store.get(key);
+  if (!entry || !isRateLimited(key)) return 0;
+  return Math.ceil((entry.windowStart + WINDOW_MS - Date.now()) / 1000);
+}
+
 export function recordFailure(key: string): void {
   const now = Date.now();
   const entry = store.get(key);
@@ -30,4 +43,10 @@ export function recordFailure(key: string): void {
 
 export function clearFailures(key: string): void {
   store.delete(key);
+}
+
+// The client IP the limiter keys on: the first x-forwarded-for hop. On Vercel
+// the platform sets that header, so a client cannot choose its own value.
+export function clientIp(headers: Headers): string {
+  return (headers.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
 }

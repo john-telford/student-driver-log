@@ -1,12 +1,42 @@
 import { verifyCredentials } from '@/services/auth';
 import { issueApiToken } from '@/lib/api-auth';
 import { preflight, withCors } from '@/lib/cors';
+import {
+  clearFailures,
+  clientIp,
+  isRateLimited,
+  recordFailure,
+  retryAfterSeconds,
+} from '@/lib/rate-limit';
 
 // POST /api/v1/auth/token — exchange { email, password } for a Bearer JWT.
 // No auth required (this is how you obtain auth). Public per the middleware
 // matcher, which excludes /api/v1.
+//
+// Failed sign-ins are limited per client IP (see lib/rate-limit). A limited
+// client gets 429 `rate_limited`, not 401: the iOS client treats a 401 as an
+// auth failure, but shows an unknown code's message and keeps the session.
 
 export async function POST(request: Request): Promise<Response> {
+  const limitKey = `token:${clientIp(request.headers)}`;
+  if (isRateLimited(limitKey)) {
+    return withCors(
+      request,
+      Response.json(
+        {
+          error: {
+            code: 'rate_limited',
+            message: 'Too many sign-in attempts. Try again in a few minutes.',
+          },
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(retryAfterSeconds(limitKey)) },
+        }
+      )
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -41,6 +71,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const user = await verifyCredentials({ email, password });
   if (!user) {
+    recordFailure(limitKey);
     return withCors(
       request,
       Response.json(
@@ -55,6 +86,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  clearFailures(limitKey);
   const token = await issueApiToken(user);
   // Never let an intermediary/proxy cache a bearer credential.
   return withCors(

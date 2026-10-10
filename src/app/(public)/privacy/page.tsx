@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <li><span className="font-bold">Student accounts</span> — names and emails of student accounts you create as a parent.</li>
           <li><span className="font-bold">Cookies</span> — on the website, used to keep you logged in (8-hour expiry). A separate cookie remembers which student account a parent last selected, for 30 days.</li>
           <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. It stores your email, password and an access token in the iOS Keychain on your device (instead of cookies), and remembers the last email you used to prefill sign-in. Your email and password are sent only to sign in; the access token, which identifies your account (your account ID), goes with every request to our server.</li>
-          <li><span className="font-bold">Technical data</span> — our hosting provider records IP addresses in its request logs. Website sign-in uses your IP address to limit repeated failed attempts; that count is held only in the server&apos;s memory, never in our database, and stops applying after 15 minutes.</li>
+          <li><span className="font-bold">Technical data</span> — our hosting provider records IP addresses in its request logs. Sign-in on the website and in the iOS app uses your IP address to limit repeated failed attempts; that count is held only in the server&apos;s memory, never in our database, and stops applying after 15 minutes.</li>
         </ul>
       </section>
 
