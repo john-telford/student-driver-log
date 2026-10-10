@@ -20,12 +20,13 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-function post(body: unknown, origin?: string): Request {
+function post(body: unknown, origin?: string, ip?: string): Request {
   return new Request('http://localhost:3000/api/v1/auth/token', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       ...(origin ? { origin } : {}),
+      ...(ip ? { 'x-forwarded-for': ip } : {}),
     },
     body: typeof body === 'string' ? body : JSON.stringify(body),
   });
@@ -84,6 +85,56 @@ describe('POST /api/v1/auth/token', () => {
     vi.mocked(verifyCredentials).mockResolvedValue(null);
     const res = await POST(post({ email: 'a', password: 'b' }, ALLOWED));
     expect(res.headers.get('access-control-allow-origin')).toBe(ALLOWED);
+  });
+});
+
+// The limiter's store is module-level, so each test signs in from its own IP.
+describe('POST /api/v1/auth/token rate limiting', () => {
+  const USER = { id: 42, name: 'Jimmy', email: 'jimmy@example.com', userType: 'student', parentId: 7 } as const;
+  const bad = (ip: string) => POST(post({ email: 'x@y.z', password: 'bad' }, undefined, ip));
+
+  async function failTimes(ip: string, times: number) {
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    for (let i = 0; i < times; i++) expect((await bad(ip)).status).toBe(401);
+  }
+
+  it('answers the 6th bad attempt with 429 rate_limited and Retry-After, without checking credentials', async () => {
+    await failTimes('198.51.100.1', 5);
+    vi.mocked(verifyCredentials).mockClear();
+
+    const res = await POST(post({ email: 'x@y.z', password: 'bad' }, ALLOWED, '198.51.100.1'));
+    expect(res.status).toBe(429);
+    const retryAfter = Number(res.headers.get('retry-after'));
+    expect(retryAfter).toBeGreaterThan(890);
+    expect(retryAfter).toBeLessThanOrEqual(900);
+    expect(await res.json()).toEqual({
+      error: { code: 'rate_limited', message: 'Too many sign-in attempts. Try again in a few minutes.' },
+    });
+    expect(res.headers.get('access-control-allow-origin')).toBe(ALLOWED);
+    expect(verifyCredentials).not.toHaveBeenCalled();
+  });
+
+  it('limits per IP: another client is unaffected', async () => {
+    await failTimes('198.51.100.2', 5);
+    expect((await bad('198.51.100.3')).status).toBe(401);
+  });
+
+  it('clears the count on a successful sign-in', async () => {
+    await failTimes('198.51.100.4', 4);
+    vi.mocked(verifyCredentials).mockResolvedValue({ ...USER });
+    const ok = await POST(post({ email: 'jimmy@example.com', password: 'ok' }, undefined, '198.51.100.4'));
+    expect(ok.status).toBe(200);
+    await failTimes('198.51.100.4', 4);
+    expect((await bad('198.51.100.4')).status).toBe(401);
+  });
+
+  it('does not count malformed-request 400s', async () => {
+    for (let i = 0; i < 6; i++) {
+      expect((await POST(post('not json{', undefined, '198.51.100.5'))).status).toBe(400);
+      expect((await POST(post('null', undefined, '198.51.100.5'))).status).toBe(400);
+    }
+    await failTimes('198.51.100.5', 4);
+    expect((await bad('198.51.100.5')).status).toBe(401);
   });
 });
 
