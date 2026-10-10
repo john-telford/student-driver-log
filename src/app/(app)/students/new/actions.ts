@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { validatePassword } from '@/lib/password';
 
 export type AddStudentState = {
   errors?: {
@@ -31,7 +32,8 @@ export async function addStudentAction(
 
   if (!name) return { errors: { name: 'Name is required.' } };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { errors: { email: 'Enter a valid email.' } };
-  if (password.length < 8) return { errors: { password: 'Password must be at least 8 characters.' } };
+  const passwordError = validatePassword(password, { name, email });
+  if (passwordError) return { errors: { password: passwordError } };
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
   if (existing) return { errors: { email: 'That email is already in use.' } };
