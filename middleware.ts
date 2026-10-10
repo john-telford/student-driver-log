@@ -15,7 +15,9 @@ export const config = {
      * - favicon.ico
      * - /login, /register, /forgot-password, /reset-password (public auth pages)
      * - /about, /privacy, /terms, /faq, /support, /brand (public info pages)
+     * - .well-known (Apple's app-site-association file; Apple's CDN fetches it
+     *   signed out and won't follow a redirect to /login)
      */
-    '/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|icon|apple-icon|login|register|forgot-password|reset-password|about|privacy|terms|faq|support|brand).*)',
+    '/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|icon|apple-icon|login|register|forgot-password|reset-password|about|privacy|terms|faq|support|brand|\\.well-known).*)',
   ],
 };
