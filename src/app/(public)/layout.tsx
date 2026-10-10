@@ -22,6 +22,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <Link href="/privacy" className="hover:text-black/70">Privacy</Link>
           <Link href="/terms" className="hover:text-black/70">Terms</Link>
           <Link href="/faq" className="hover:text-black/70">FAQ</Link>
+          <Link href="/support" className="hover:text-black/70">Support</Link>
         </div>
       </footer>
     </div>

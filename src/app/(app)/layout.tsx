@@ -64,6 +64,7 @@ export default async function AppLayout({
             <Link href="/privacy" className="hover:text-black/70">Privacy</Link>
             <Link href="/terms" className="hover:text-black/70">Terms</Link>
             <Link href="/faq" className="hover:text-black/70">FAQ</Link>
+            <Link href="/support" className="hover:text-black/70">Support</Link>
           </div>
           {(process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_GIT_SHA) && (
             <span className="ml-auto text-xs text-black/30 font-mono">

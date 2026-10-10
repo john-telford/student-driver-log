@@ -21,8 +21,8 @@ export default function AboutPage() {
         </p>
         <p>
           There are other apps that do this. This one is mine, and now yours too if it's useful.
-          It's free, it runs in your browser, and it installs on your phone's home screen without
-          any app store involved.
+          It's free and it runs in your browser. For students, an iPhone and iPad app, Teen Driver
+          Log, is coming to the App Store.
         </p>
         <p>
           It's also a small demonstration of something I find genuinely exciting: people with a
@@ -40,7 +40,8 @@ export default function AboutPage() {
             'Tracks daytime and nighttime driving hours for each session',
             'Supports multiple student accounts under one parent login',
             'Generates a printable report matching Illinois SOS Form DSD X 152.4',
-            'Works as an installable app on iOS and Android home screens',
+            'Installs on Android home screens straight from the browser',
+            'An iPhone and iPad app for students, Teen Driver Log, coming to the App Store',
             'Free — no subscriptions, no ads, no account required beyond your own login',
           ].map((item) => (
             <li key={item} className="flex gap-3">

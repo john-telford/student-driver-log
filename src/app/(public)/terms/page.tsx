@@ -80,13 +80,21 @@ export default function TermsPage() {
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Questions</h2>
         <p>
+          Email{' '}
+          <a
+            href="mailto:support@studentdriver.site"
+            className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
+          >
+            support@studentdriver.site
+          </a>{' '}
+          or{' '}
           <a
             href="https://github.com/john-telford/student-driver-log"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary font-bold underline underline-offset-2 hover:opacity-70"
           >
-            Open an issue on GitHub
+            open an issue on GitHub
           </a>{' '}
           with any questions or concerns.
         </p>
