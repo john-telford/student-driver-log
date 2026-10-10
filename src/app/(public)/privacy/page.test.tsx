@@ -36,6 +36,9 @@ describe('PrivacyPage', () => {
   it('discloses technical data, the GA cookies, the selected-student cookie and students', () => {
     expect(text).toContain('Technical data');
     expect(text).toContain('IP addresses in its request logs');
+    expect(text).toContain(
+      "Sign-in on the website and in the iOS app counts attempts by IP address and the email entered, to limit repeated failed attempts; that count is held only in the server's memory, never in our database, and stops applying after 15 minutes.",
+    );
     expect(text).toMatch(/including signed-in pages/);
     expect(text).toContain('_ga');
     expect(text).toContain('a parent last selected, for 30 days');

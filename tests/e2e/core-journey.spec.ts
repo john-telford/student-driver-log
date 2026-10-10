@@ -7,7 +7,9 @@ test('core journey: register, add student, log trip, verify trips list, view rep
   const ts = Date.now();
   const parentEmail = `parent-${ts}@example.com`;
   const studentEmail = `student-${ts}@example.com`;
-  const password = 'testpassword123';
+  // Must pass the password rule: not common, and free of the names below
+  // ('Test Parent', 'Test Student') and the email local parts.
+  const password = 'gravel-lantern-42';
   const today = new Date().toISOString().split('T')[0];
 
   // --- Register as parent ---

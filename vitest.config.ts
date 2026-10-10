@@ -11,5 +11,8 @@ export default defineConfig({
   },
   test: {
     exclude: ['**/node_modules/**', 'tests/e2e/**'],
+    // next-auth imports `next/server` without an extension, which Node's ESM
+    // resolver rejects; letting Vite transform it resolves the import.
+    server: { deps: { inline: ['next-auth'] } },
   },
 });

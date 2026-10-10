@@ -6,6 +6,7 @@ import { AuthError } from 'next-auth';
 import { signIn } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema';
+import { validatePassword } from '@/lib/password';
 
 export type RegisterState = { errors: Record<string, string> } | undefined;
 
@@ -25,9 +26,8 @@ export async function registerAction(
   if (!email || !EMAIL_RE.test(email)) {
     errors.email = 'A valid email address is required.';
   }
-  if (password.length < 8) {
-    errors.password = 'Password must be at least 8 characters.';
-  }
+  const passwordError = validatePassword(password, { name, email });
+  if (passwordError) errors.password = passwordError;
 
   if (Object.keys(errors).length > 0) return { errors };
 

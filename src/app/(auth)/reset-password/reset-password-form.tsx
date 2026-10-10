@@ -27,7 +27,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
           autoComplete="new-password"
           className="w-full rounded border border-white/30 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
-        <p className="text-white/40 text-[10px] mt-1">Minimum 8 characters</p>
+        <p className="text-white/40 text-[10px] mt-1">At least 8 characters. Not a common password, and not your name or email.</p>
       </div>
 
       {state?.error && (
