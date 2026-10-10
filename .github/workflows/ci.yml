@@ -1,10 +1,11 @@
 name: CI
 
+# Pull requests run CI on the merge result; main runs it again after each
+# merge. Branch pushes alone don't, so a PR branch isn't tested twice.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
-    branches: ['**']
 
 jobs:
   ci:
