@@ -27,11 +27,13 @@ import { passwordResetTokens, users } from '@/db/schema';
 import { resetPasswordAction } from './actions';
 
 const RAW_TOKEN = 'raw-reset-token';
+// The name and the email local part share no 4+ character piece, so the name
+// test and the email test each pin one of the two checks.
 
 beforeAll(async () => {
   if (!process.env.DATABASE_URL?.startsWith(`file:${tmpDir}`)) throw new Error('refusing to run against a real database');
   await migrate(db, { migrationsFolder: fileURLToPath(new URL('../../../../drizzle', import.meta.url)) });
-  await db.insert(users).values({ id: 1, email: 'casey.morgan@example.com', passwordHash: 'old-hash', name: 'Casey Morgan', userType: 'parent' });
+  await db.insert(users).values({ id: 1, email: 'cm.driver@example.com', passwordHash: 'old-hash', name: 'Casey Morgan', userType: 'parent' });
   await db.insert(passwordResetTokens).values({
     userId: 1,
     tokenHash: createHash('sha256').update(RAW_TOKEN).digest('hex'),
@@ -76,9 +78,10 @@ describe('resetPasswordAction password rule', () => {
   });
 
   it("rejects a password containing the account's email local part", async () => {
-    expect(await resetPasswordAction(undefined, form('casey-drives-9'))).toEqual({
+    expect(await resetPasswordAction(undefined, form('night-driver-9'))).toEqual({
       error: "Password can't contain your name or email address.",
     });
+    expect(await state()).toEqual({ hash: 'old-hash', used: null });
   });
 
   it('still enforces the 8-character minimum, including a missing password', async () => {

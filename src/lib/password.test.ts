@@ -56,8 +56,21 @@ describe('validatePassword', () => {
     expect(validatePassword('hello-driver-9', { email: 'new.driver@example.com' })).toBe(message);
   });
 
-  it('ignores name and email pieces shorter than 3 characters', () => {
+  it('ignores name and email pieces shorter than 4 characters', () => {
     expect(validatePassword('Al-is-driving-9', { name: 'Al Wu', email: 'al.wu@example.com' })).toBeNull();
+    expect(validatePassword('planner-fleet-max9', { name: 'Ann Lee', email: 'max.kim@example.com' })).toBeNull();
+  });
+
+  it('checks name and email pieces of exactly 4 characters', () => {
+    const message = "Password can't contain your name or email address.";
+    expect(validatePassword('savanna-river-9', { name: 'Anna Lee' })).toBe(message);
+    expect(validatePassword('river-JADE-9', { email: 'jade.ko@example.com' })).toBe(message);
+  });
+
+  it("names the student's details when a parent sets a student's password", () => {
+    expect(validatePassword('JimmysCar2026', { name: 'Jimmy Telford', forStudent: true })).toBe(
+      "Password can't contain the student's name or email address."
+    );
   });
 
   it("ignores the email's domain", () => {

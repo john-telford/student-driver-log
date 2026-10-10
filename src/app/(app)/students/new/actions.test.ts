@@ -37,6 +37,8 @@ async function studentExists(email: string) {
   return (await db.select().from(users).where(eq(users.email, email))).length > 0;
 }
 
+const PERSONAL = "Password can't contain the student's name or email address.";
+
 describe('addStudentAction password rule', () => {
   it('rejects a common password and creates no student', async () => {
     const res = await addStudentAction(undefined, form('Jimmy Lee', 'jimmy@example.com', 'ILOVEYOU'));
@@ -44,15 +46,18 @@ describe('addStudentAction password rule', () => {
     expect(await studentExists('jimmy@example.com')).toBe(false);
   });
 
+  // The name and email fixtures share no 4+ character piece, so each test
+  // pins one of the two checks.
   it("rejects a password containing the student's name", async () => {
-    const res = await addStudentAction(undefined, form('Jimmy Lee', 'jimmy@example.com', 'Jimmy-drives-2026'));
-    expect(res).toEqual({ errors: { password: "Password can't contain your name or email address." } });
-    expect(await studentExists('jimmy@example.com')).toBe(false);
+    const res = await addStudentAction(undefined, form('Jimmy Lee', 'jl@example.com', 'Jimmy-drives-2026'));
+    expect(res).toEqual({ errors: { password: PERSONAL } });
+    expect(await studentExists('jl@example.com')).toBe(false);
   });
 
   it("rejects a password containing the student's email local part", async () => {
     const res = await addStudentAction(undefined, form('Jimmy Lee', 'roadrunner@example.com', 'my-roadrunner-1'));
-    expect(res).toEqual({ errors: { password: "Password can't contain your name or email address." } });
+    expect(res).toEqual({ errors: { password: PERSONAL } });
+    expect(await studentExists('roadrunner@example.com')).toBe(false);
   });
 
   it('still enforces the 8-character minimum', async () => {
