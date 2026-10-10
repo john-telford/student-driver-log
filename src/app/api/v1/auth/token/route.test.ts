@@ -91,14 +91,26 @@ describe('POST /api/v1/auth/token', () => {
 // The limiter's store is module-level, so each test signs in from its own IP.
 describe('POST /api/v1/auth/token rate limiting', () => {
   const USER = { id: 42, name: 'Jimmy', email: 'jimmy@example.com', userType: 'student', parentId: 7 } as const;
-  const bad = (ip: string) => POST(post({ email: 'x@y.z', password: 'bad' }, undefined, ip));
+  const bad = (ip: string, email = 'x@y.z') => POST(post({ email, password: 'bad' }, undefined, ip));
+  const good = (ip: string) => POST(post({ email: 'x@y.z', password: 'ok' }, undefined, ip));
 
-  async function failTimes(ip: string, times: number) {
+  async function failTimes(ip: string, times: number, email = 'x@y.z') {
     vi.mocked(verifyCredentials).mockResolvedValue(null);
-    for (let i = 0; i < times; i++) expect((await bad(ip)).status).toBe(401);
+    for (let i = 0; i < times; i++) expect((await bad(ip, email)).status).toBe(401);
   }
 
-  it('answers the 6th bad attempt with 429 rate_limited and Retry-After, without checking credentials', async () => {
+  async function succeed(ip: string) {
+    vi.mocked(verifyCredentials).mockResolvedValue({ ...USER });
+    expect((await good(ip)).status).toBe(200);
+  }
+
+  async function expectLimited(ip: string, email = 'x@y.z') {
+    vi.mocked(verifyCredentials).mockClear();
+    expect((await bad(ip, email)).status).toBe(429);
+    expect(verifyCredentials).not.toHaveBeenCalled();
+  }
+
+  it('answers the 6th attempt with 429 rate_limited and Retry-After, without checking credentials', async () => {
     await failTimes('198.51.100.1', 5);
     vi.mocked(verifyCredentials).mockClear();
 
@@ -114,27 +126,71 @@ describe('POST /api/v1/auth/token rate limiting', () => {
     expect(verifyCredentials).not.toHaveBeenCalled();
   });
 
-  it('limits per IP: another client is unaffected', async () => {
-    await failTimes('198.51.100.2', 5);
-    expect((await bad('198.51.100.3')).status).toBe(401);
-  });
-
-  it('clears the count on a successful sign-in', async () => {
-    await failTimes('198.51.100.4', 4);
-    vi.mocked(verifyCredentials).mockResolvedValue({ ...USER });
-    const ok = await POST(post({ email: 'jimmy@example.com', password: 'ok' }, undefined, '198.51.100.4'));
-    expect(ok.status).toBe(200);
-    await failTimes('198.51.100.4', 4);
-    expect((await bad('198.51.100.4')).status).toBe(401);
-  });
-
-  it('does not count malformed-request 400s', async () => {
-    for (let i = 0; i < 6; i++) {
-      expect((await POST(post('not json{', undefined, '198.51.100.5'))).status).toBe(400);
-      expect((await POST(post('null', undefined, '198.51.100.5'))).status).toBe(400);
+  it('counts Retry-After down from the first attempt in the window', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      await failTimes('198.51.100.8', 5);
+      vi.advanceTimersByTime(10 * 60 * 1000);
+      const res = await bad('198.51.100.8');
+      expect(res.status).toBe(429);
+      expect(res.headers.get('retry-after')).toBe('300');
+    } finally {
+      vi.useRealTimers();
     }
+  });
+
+  it('keys on the client IP and the normalized email', async () => {
+    await failTimes('198.51.100.2', 5);
+    // Same IP, other email; same email, other IP: both still get a real check.
+    await failTimes('198.51.100.2', 1, 'pat@example.com');
+    await failTimes('198.51.100.3', 1);
+    // Case and surrounding spaces don't make a new key.
+    await expectLimited('198.51.100.2', ' X@Y.Z ');
+  });
+
+  it('counts concurrent attempts before checking credentials, so at most 5 of a burst reach it', async () => {
+    let release!: (value: null) => void;
+    const slow = new Promise<null>((resolve) => { release = resolve; });
+    vi.mocked(verifyCredentials).mockReturnValue(slow);
+
+    // POST awaits the body before counting, so start them all, then let the
+    // credential checks finish together.
+    const burst = Array.from({ length: 10 }, () => bad('198.51.100.4'));
+    await vi.waitFor(() => expect(verifyCredentials).toHaveBeenCalledTimes(5));
+    release(null);
+    const statuses = (await Promise.all(burst)).map((r) => r.status).sort();
+
+    expect(verifyCredentials).toHaveBeenCalledTimes(5);
+    expect(statuses).toEqual([401, 401, 401, 401, 401, 429, 429, 429, 429, 429]);
+  });
+
+  it('does not reset earlier failures on a success', async () => {
     await failTimes('198.51.100.5', 4);
-    expect((await bad('198.51.100.5')).status).toBe(401);
+    await succeed('198.51.100.5');
+    await failTimes('198.51.100.5', 1);
+    await expectLimited('198.51.100.5');
+  });
+
+  it('limits a repeated 4 failures + 1 success cycle', async () => {
+    await failTimes('198.51.100.6', 4);
+    await succeed('198.51.100.6');
+    await failTimes('198.51.100.6', 1);
+    await expectLimited('198.51.100.6');
+    // Still limited even for the right password.
+    vi.mocked(verifyCredentials).mockResolvedValue({ ...USER });
+    expect((await good('198.51.100.6')).status).toBe(429);
+  });
+
+  it('does not count malformed-request 400s or requests without an email', async () => {
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    for (let i = 0; i < 6; i++) {
+      expect((await POST(post('not json{', undefined, '198.51.100.7'))).status).toBe(400);
+      expect((await POST(post('null', undefined, '198.51.100.7'))).status).toBe(400);
+      expect((await POST(post({ password: 'bad' }, undefined, '198.51.100.7'))).status).toBe(401);
+      expect((await POST(post({ email: '  ', password: 'bad' }, undefined, '198.51.100.7'))).status).toBe(401);
+    }
+    await failTimes('198.51.100.7', 5);
+    await expectLimited('198.51.100.7');
   });
 });
 

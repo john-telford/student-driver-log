@@ -37,7 +37,7 @@ describe('PrivacyPage', () => {
     expect(text).toContain('Technical data');
     expect(text).toContain('IP addresses in its request logs');
     expect(text).toContain(
-      "Sign-in on the website and in the iOS app uses your IP address to limit repeated failed attempts; that count is held only in the server's memory, never in our database, and stops applying after 15 minutes.",
+      "Sign-in on the website and in the iOS app counts attempts by IP address and the email entered, to limit repeated failed attempts; that count is held only in the server's memory, never in our database, and stops applying after 15 minutes.",
     );
     expect(text).toMatch(/including signed-in pages/);
     expect(text).toContain('_ga');
