@@ -77,7 +77,7 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Students</h2>
         <p>
-          A parent or guardian creates each student account and controls it; students are minors.
+          A parent or guardian creates each student account and controls it.
           The parent can see and edit the student&apos;s driving log.
         </p>
       </section>

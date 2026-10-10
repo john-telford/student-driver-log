@@ -39,7 +39,7 @@ describe('PrivacyPage', () => {
     expect(text).toMatch(/including signed-in pages/);
     expect(text).toContain('_ga');
     expect(text).toContain('a parent last selected, for 30 days');
-    expect(text).toMatch(/creates each student account and controls it; students are minors/);
+    expect(text).toMatch(/creates each student account and controls it\. The parent can see/);
   });
 
   it('links the support email', () => {
