@@ -32,7 +32,7 @@ export async function addStudentAction(
 
   if (!name) return { errors: { name: 'Name is required.' } };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { errors: { email: 'Enter a valid email.' } };
-  const passwordError = validatePassword(password, { name, email });
+  const passwordError = validatePassword(password, { name, email, forStudent: true });
   if (passwordError) return { errors: { password: passwordError } };
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));

@@ -51,6 +51,7 @@ export default function AddStudentForm() {
           autoComplete="new-password"
           className={inputClass}
         />
+        <p className="mt-1 text-[10px] text-muted-foreground">At least 8 characters. Not a common password, and not the student&apos;s name or email.</p>
         {state?.errors?.password && <p className={errorClass}>{state.errors.password}</p>}
       </div>
       {state?.errors?.form && <p className={errorClass}>{state.errors.form}</p>}
