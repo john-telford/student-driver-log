@@ -125,7 +125,7 @@ src/
 - Components are copied into `src/components/ui/` — they are owned code, not a runtime dep
 - **No state management libraries** — use React state + `useActionState` + Server Components
 - `cn()` utility for all className composition (clsx + tailwind-merge)
-- Design tokens in `src/app/globals.css`: `--primary` = Interstate green `oklch(0.44 0.16 148)`, `--accent` = highway yellow `oklch(0.88 0.18 89)`
+- Design tokens in `src/app/globals.css`: `--primary` = Interstate green `oklch(0.464 0.114 155.4)`, `--accent` = highway yellow `oklch(0.88 0.18 89)`
 - Print styles in `globals.css` — `print:hidden` hides non-report elements
 
 ---

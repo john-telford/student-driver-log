@@ -129,7 +129,7 @@ Auth.js v5 issues a JWT session on login. The session carries `id`, `name`, `ema
 
 ## UI Theme
 
-Highway sign aesthetic — Pantone 342 Interstate green (`oklch(0.44 0.16 148)`), highway yellow accent, Overpass font (open-source Highway Gothic clone), Illinois state route shield on the login screen.
+Highway sign aesthetic — Pantone 342 Interstate green (`oklch(0.464 0.114 155.4)`), highway yellow accent, Overpass font (open-source Highway Gothic clone), Illinois state route shield on the login screen.
 
 ---
 

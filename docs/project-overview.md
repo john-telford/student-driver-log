@@ -87,7 +87,7 @@ Personal project — John Telford tracking hours for his son Jimmy.
 
 Highway sign aesthetic:
 
-- **Primary color**: Pantone 342 / Interstate green — `oklch(0.44 0.16 148)` ≈ `#006B3C`
+- **Primary color**: Pantone 342 / Interstate green — `oklch(0.464 0.114 155.4)` = `#006B3C`
 - **Accent color**: FHWA highway yellow — `oklch(0.88 0.18 89)` ≈ `#FFCD00`
 - **Font**: Overpass (open-source Highway Gothic / FHWA Series E clone)
 - **Login screen**: Illinois state route shield SVG on green sign panel

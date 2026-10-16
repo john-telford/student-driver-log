@@ -26,6 +26,14 @@ describe('parseRootTokens', () => {
       expect(oklchToHex(tokens[name])).toMatch(/^#[0-9A-F]{6}$/);
     }
   });
+
+  it('keeps primary on the iOS app sign green (#006B3C)', () => {
+    const css = readFileSync(join(process.cwd(), 'src/app/globals.css'), 'utf8');
+    const tokens = parseRootTokens(css);
+    for (const name of ['primary', 'ring', 'chart-1', 'sidebar-primary', 'sidebar-ring']) {
+      expect(oklchToHex(tokens[name])).toBe('#006B3C');
+    }
+  });
 });
 
 describe('oklchToHex', () => {

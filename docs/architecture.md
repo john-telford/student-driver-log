@@ -159,7 +159,7 @@ Copied into the repo (not a runtime dependency). Currently installed:
 Key design tokens:
 
 ```css
---primary:  oklch(0.44 0.16 148)  /* Interstate green  ~#006B3C */
+--primary:  oklch(0.464 0.114 155.4)  /* Interstate green  #006B3C */
 --accent:   oklch(0.88 0.18 89)   /* Highway yellow    ~#FFCD00 */
 ```
 
