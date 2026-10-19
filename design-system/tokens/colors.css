@@ -2,7 +2,7 @@
   /* ── Base palette ─────────────────────────────────────────────
      Interstate green — Pantone 342 / FHWA guide-sign standard (#006B3C)
      Highway yellow  — FHWA warning-sign yellow (#FFCD00) */
-  --green-sign:        oklch(0.44 0.16 148);   /* #006B3C */
+  --green-sign:        oklch(0.464 0.114 155.4);   /* #006B3C */
   --green-deep:        oklch(0.32 0.12 148);   /* nav / sidebar */
   --green-text:        oklch(0.38 0.15 148);   /* body copy */
   --green-mid:         oklch(0.52 0.16 148);

@@ -48,8 +48,8 @@
 }
 
 :root {
-  /* Interstate green — Pantone 342 / FHWA guide sign standard (~#006B3C) */
-  --primary:            oklch(0.44 0.16 148);
+  /* Interstate green — Pantone 342 / FHWA guide sign standard (#006B3C) */
+  --primary:            oklch(0.464 0.114 155.4);
   --primary-foreground: oklch(1 0 0);
 
   /* Highway yellow: #FFCD00 — FHWA warning sign yellow */
@@ -77,13 +77,13 @@
   /* Borders and inputs */
   --border: oklch(0.82 0.02 148);
   --input:  oklch(0.82 0.02 148);
-  --ring:   oklch(0.44 0.16 148);
+  --ring:   oklch(0.464 0.114 155.4);
 
   /* Destructive: traffic-sign red */
   --destructive: oklch(0.55 0.22 25);
 
   /* Progress/chart greens */
-  --chart-1: oklch(0.44 0.16 148);
+  --chart-1: oklch(0.464 0.114 155.4);
   --chart-2: oklch(0.52 0.16 148);
   --chart-3: oklch(0.62 0.14 148);
   --chart-4: oklch(0.72 0.11 148);
@@ -94,12 +94,12 @@
   /* Sidebar */
   --sidebar:                  oklch(0.32 0.12 148);
   --sidebar-foreground:       oklch(1 0 0);
-  --sidebar-primary:          oklch(0.44 0.16 148);
+  --sidebar-primary:          oklch(0.464 0.114 155.4);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent:           oklch(0.88 0.18 89);
   --sidebar-accent-foreground: oklch(0.15 0 0);
   --sidebar-border:           oklch(0.36 0.12 148);
-  --sidebar-ring:             oklch(0.44 0.16 148);
+  --sidebar-ring:             oklch(0.464 0.114 155.4);
 }
 
 /* Dark mode not supported in MVP — app always uses light (highway green) theme */
@@ -125,7 +125,7 @@
 }
 
 .sign-card-panel {
-  background-color: oklch(0.44 0.16 148);
+  background-color: oklch(0.464 0.114 155.4);
   border-radius: var(--radius);
   color: white;
 }
@@ -145,7 +145,7 @@
 
 /* Highway sign utility — standalone green panel badge */
 .sign-panel {
-  background-color: oklch(0.44 0.16 148);
+  background-color: oklch(0.464 0.114 155.4);
   color: white;
   font-weight: 700;
   letter-spacing: 0.04em;
