@@ -10,8 +10,11 @@ const weatherLabels: Record<string, string> = {
   clear: 'Clear', rain: 'Rain', snow: 'Snow', fog: 'Fog', ice: 'Ice',
 };
 
-// Pantone 342 in hex for PDF
-const GREEN = '#1a5c2e';
+// Pantone 342 / FHWA guide-sign green — the brand colour used by the app
+// (#006B3C, same value as global-error.tsx and the PWA manifest) and by the
+// iOS app. The old #1a5c2e was a mis-transcription: close enough to look
+// green, not the brand shade.
+const GREEN = '#006B3C';
 const LIGHT_GREEN = '#e8f2eb';
 
 const s = StyleSheet.create({

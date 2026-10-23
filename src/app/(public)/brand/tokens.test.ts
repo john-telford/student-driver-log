@@ -27,9 +27,12 @@ describe('parseRootTokens', () => {
     }
   });
 
-  it('renders interstate green exactly, not an approximation', () => {
+  it('keeps primary on the iOS app sign green (#006B3C)', () => {
     const css = readFileSync(join(process.cwd(), 'src/app/globals.css'), 'utf8');
-    expect(oklchToHex(parseRootTokens(css).primary)).toBe('#006B3C');
+    const tokens = parseRootTokens(css);
+    for (const name of ['primary', 'ring', 'chart-1', 'sidebar-primary', 'sidebar-ring']) {
+      expect(oklchToHex(tokens[name])).toBe('#006B3C');
+    }
   });
 
   it('keeps the whole green ramp on the interstate-green hue', () => {
