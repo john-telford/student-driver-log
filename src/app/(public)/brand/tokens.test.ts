@@ -34,6 +34,20 @@ describe('parseRootTokens', () => {
       expect(oklchToHex(tokens[name])).toBe('#006B3C');
     }
   });
+
+  it('keeps the whole green ramp on the interstate-green hue', () => {
+    const css = readFileSync(join(process.cwd(), 'src/app/globals.css'), 'utf8');
+    const greens = Object.entries(parseRootTokens(css)).filter(([, value]) => {
+      const m = value.match(/^oklch\(\s*[\d.]+\s+([\d.]+)\s+([\d.]+)\s*\)$/);
+      return m && Number(m[1]) >= 0.05 && Number(m[2]) >= 120;
+    });
+    // 7 aliases + the chart ramp + sidebar greens: if the filter silently
+    // stopped matching, the loop below would pass on an empty list.
+    expect(greens.length).toBeGreaterThanOrEqual(10);
+    for (const [name, value] of greens) {
+      expect(value, name).toMatch(/^oklch\([\d.]+ [\d.]+ 155\.4\)$/);
+    }
+  });
 });
 
 describe('oklchToHex', () => {

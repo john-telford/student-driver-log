@@ -58,25 +58,25 @@
 
   /* Page chrome: white background, highway green text */
   --background:         oklch(1 0 0);
-  --foreground:         oklch(0.38 0.15 148);    /* Interstate green for body text */
+  --foreground:         oklch(0.42 0.103 155.4);    /* Interstate green for body text */
 
   /* Cards: white panels so green text reads cleanly */
   --card:               oklch(1 0 0);
-  --card-foreground:    oklch(0.38 0.15 148);
+  --card-foreground:    oklch(0.42 0.103 155.4);
   --popover:            oklch(1 0 0);
-  --popover-foreground: oklch(0.38 0.15 148);
+  --popover-foreground: oklch(0.42 0.103 155.4);
 
   /* Secondary: darker highway green for nav/sidebar */
-  --secondary:            oklch(0.32 0.12 148);
+  --secondary:            oklch(0.38 0.093 155.4);
   --secondary-foreground: oklch(1 0 0);
 
   /* Muted: light gray */
-  --muted:            oklch(0.88 0.006 148);
-  --muted-foreground: oklch(0.52 0.08 148);
+  --muted:            oklch(0.88 0.006 155.4);
+  --muted-foreground: oklch(0.52 0.08 155.4);
 
   /* Borders and inputs */
-  --border: oklch(0.82 0.02 148);
-  --input:  oklch(0.82 0.02 148);
+  --border: oklch(0.82 0.02 155.4);
+  --input:  oklch(0.82 0.02 155.4);
   --ring:   oklch(0.464 0.114 155.4);
 
   /* Destructive: traffic-sign red */
@@ -84,21 +84,21 @@
 
   /* Progress/chart greens */
   --chart-1: oklch(0.464 0.114 155.4);
-  --chart-2: oklch(0.52 0.16 148);
-  --chart-3: oklch(0.62 0.14 148);
-  --chart-4: oklch(0.72 0.11 148);
+  --chart-2: oklch(0.54 0.128 155.4);
+  --chart-3: oklch(0.64 0.115 155.4);
+  --chart-4: oklch(0.74 0.09 155.4);
   --chart-5: oklch(0.88 0.18 89);   /* yellow for last segment */
 
   --radius: 0.5rem;    /* matches highway sign corner rounding */
 
   /* Sidebar */
-  --sidebar:                  oklch(0.32 0.12 148);
+  --sidebar:                  oklch(0.38 0.093 155.4);
   --sidebar-foreground:       oklch(1 0 0);
   --sidebar-primary:          oklch(0.464 0.114 155.4);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent:           oklch(0.88 0.18 89);
   --sidebar-accent-foreground: oklch(0.15 0 0);
-  --sidebar-border:           oklch(0.36 0.12 148);
+  --sidebar-border:           oklch(0.40 0.09 155.4);
   --sidebar-ring:             oklch(0.464 0.114 155.4);
 }
 
@@ -121,7 +121,7 @@
   padding: 6px;
   background: white;
   border-radius: calc(var(--radius) + 4px);   /* slightly larger than panel */
-  box-shadow: 0 8px 32px oklch(0.36 0.12 152 / 25%);
+  box-shadow: 0 8px 32px oklch(0.40 0.09 155.4 / 25%);
 }
 
 .sign-card-panel {
@@ -149,7 +149,7 @@
   color: white;
   font-weight: 700;
   letter-spacing: 0.04em;
-  border: 3px solid oklch(0.60 0.08 148);
+  border: 3px solid oklch(0.60 0.06 155.4);
   border-radius: 4px;
   padding: 0.5rem 1.25rem;
   text-transform: uppercase;

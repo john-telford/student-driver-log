@@ -3,19 +3,19 @@
      Interstate green — Pantone 342 / FHWA guide-sign standard (#006B3C)
      Highway yellow  — FHWA warning-sign yellow (#FFCD00) */
   --green-sign:        oklch(0.464 0.114 155.4);   /* #006B3C */
-  --green-deep:        oklch(0.32 0.12 148);   /* nav / sidebar */
-  --green-text:        oklch(0.38 0.15 148);   /* body copy */
-  --green-mid:         oklch(0.52 0.16 148);
-  --green-light:       oklch(0.62 0.14 148);
-  --green-pale:        oklch(0.72 0.11 148);
-  --green-rule:        oklch(0.60 0.08 148);   /* sign-panel border */
+  --green-deep:        oklch(0.38 0.093 155.4);   /* nav / sidebar */
+  --green-text:        oklch(0.42 0.103 155.4);   /* body copy */
+  --green-mid:         oklch(0.54 0.128 155.4);
+  --green-light:       oklch(0.64 0.115 155.4);
+  --green-pale:        oklch(0.74 0.09 155.4);
+  --green-rule:        oklch(0.60 0.06 155.4);   /* sign-panel border */
   --yellow-highway:    oklch(0.88 0.18 89);    /* #FFCD00 */
   --red-traffic:       oklch(0.55 0.22 25);
   --white:             oklch(1 0 0);
   --ink:               oklch(0.15 0 0);
-  --gray-panel:        oklch(0.88 0.006 148);
-  --gray-line:         oklch(0.82 0.02 148);
-  --gray-text:         oklch(0.52 0.08 148);
+  --gray-panel:        oklch(0.88 0.006 155.4);
+  --gray-line:         oklch(0.82 0.02 155.4);
+  --gray-text:         oklch(0.52 0.08 155.4);
 
   /* ── Semantic aliases (names match the product's globals.css) ── */
   --primary:            var(--green-sign);
@@ -53,7 +53,7 @@
   --sidebar-primary-foreground: var(--white);
   --sidebar-accent:             var(--yellow-highway);
   --sidebar-accent-foreground:  var(--ink);
-  --sidebar-border:             oklch(0.36 0.12 148);
+  --sidebar-border:             oklch(0.40 0.09 155.4);
   --sidebar-ring:               var(--green-sign);
 
   /* ── On-green text tiers (used on sign panels and the app header) ── */
