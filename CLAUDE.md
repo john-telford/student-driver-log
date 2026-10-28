@@ -5,7 +5,7 @@ MVP is simple with parent and student accounts; v1.0 adds Google OAuth. v1.5 add
 Do not build v1.0 or v1.5 features unless explicitly asked.
 
 ## Stack
-- Next.js 15 (App Router) + TypeScript
+- Next.js 16 (App Router) + TypeScript
 - Drizzle ORM + libSQL (local: file, prod: Turso)
 - Auth.js v5 (credentials provider for MVP)
 - shadcn/ui components on Tailwind CSS
@@ -58,8 +58,8 @@ When starting an issue: read the issue body, ask clarifying questions before
 coding if anything is ambiguous, then implement. When finishing: run tests,
 commit with a conventional message, push, open a PR that closes the issue.
 
-## Next.js 15 specifics
-- This project uses Next.js 15. APIs and conventions have changed from 13/14. Do not write code from memory for Next.js.
+## Next.js 16 specifics
+- This project uses Next.js 16. APIs and conventions have changed from 13/14/15. Do not write code from memory for Next.js.
 - Before writing any route handler, page, layout, server action, or middleware, check `node_modules/next/dist/docs/` for the current pattern.
 - Known breakages from prior versions: `params` and `searchParams` are now async (must be awaited), caching defaults changed, some `next/headers` APIs changed.
 - See AGENTS.md for the upstream warning.

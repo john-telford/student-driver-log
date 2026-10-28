@@ -21,7 +21,7 @@ Illinois learner's permit hour tracker. Parents register, create student account
 
 | Layer | Technology | Version |
 |---|---|---|
-| Framework | Next.js App Router | 16.2.3 |
+| Framework | Next.js App Router | 16.4.3 |
 | Runtime | React | 19.2.4 |
 | Language | TypeScript (strict) | ^5 |
 | Database (local) | libSQL / SQLite file | @libsql/client ^0.17.2 |
