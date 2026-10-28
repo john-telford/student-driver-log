@@ -8,6 +8,7 @@ import { users, type UserType } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { updateTrip, deleteTrip } from '@/services/trips';
 import { ValidationError, NotFoundError } from '@/services/errors';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 export type TripEditState = {
   success?: true;
@@ -52,7 +53,10 @@ export async function deleteTripAction(tripId: number): Promise<void> {
   } catch (err) {
     // Preserve the pre-refactor silent no-op: a non-owned/already-deleted
     // trip id does not surface an error to the UI.
-    if (err instanceof NotFoundError) return;
+    if (err instanceof NotFoundError) {
+      securityEvent('trip.not_found', { surface: 'web', ip: await actionIp(), userId, path: `trip/${tripId}`, outcome: 'delete' });
+      return;
+    }
     throw err;
   }
 }
@@ -93,6 +97,7 @@ export async function updateTripAction(
     );
   } catch (err) {
     if (err instanceof NotFoundError) {
+      securityEvent('trip.not_found', { surface: 'web', ip: await actionIp(), userId, path: `trip/${tripId}`, outcome: 'update' });
       return { errors: { form: 'Trip not found.' } };
     }
     if (err instanceof ValidationError && err.fields) {

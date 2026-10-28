@@ -11,7 +11,7 @@ export async function GET(request: Request): Promise<Response> {
     const report = await getReport(studentId);
     return withCors(request, Response.json(report));
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 

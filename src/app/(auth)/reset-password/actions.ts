@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@/db';
 import { users, passwordResetTokens } from '@/db/schema';
 import { validatePassword } from '@/lib/password';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 export type ResetPasswordState = { error: string } | undefined;
 
@@ -34,6 +35,7 @@ export async function resetPasswordAction(
     );
 
   if (!tokenRow) {
+    securityEvent('password_reset.invalid_token', { surface: 'web', ip: await actionIp() });
     return { error: 'This link has expired or has already been used. Request a new one.' };
   }
 
@@ -56,5 +58,6 @@ export async function resetPasswordAction(
       .where(eq(passwordResetTokens.id, tokenRow.id));
   });
 
+  securityEvent('password_reset.completed', { surface: 'web', ip: await actionIp(), userId: tokenRow.userId });
   redirect('/login?reset=1');
 }

@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { Resend } from 'resend';
 import { db } from '@/db';
 import { users, passwordResetTokens } from '@/db/schema';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM ?? 'onboarding@resend.dev';
@@ -25,7 +26,11 @@ export async function requestPasswordResetAction(
     .from(users)
     .where(eq(users.email, email));
 
-  if (!user) return { message: SUCCESS_MESSAGE };
+  if (!user) {
+    securityEvent('password_reset.requested', { surface: 'web', ip: await actionIp(), email, outcome: 'unknown_email' });
+    return { message: SUCCESS_MESSAGE };
+  }
+  securityEvent('password_reset.requested', { surface: 'web', ip: await actionIp(), email, outcome: 'sent' });
 
   const raw = randomBytes(32).toString('hex');
   const tokenHash = createHash('sha256').update(raw).digest('hex');

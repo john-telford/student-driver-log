@@ -12,7 +12,7 @@ export async function GET(request: Request): Promise<Response> {
     const trips = await listTrips(studentId);
     return withCors(request, Response.json(trips));
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 
@@ -38,7 +38,7 @@ export async function POST(request: Request): Promise<Response> {
     });
     return withCors(request, Response.json(trip, { status: 201 }));
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 

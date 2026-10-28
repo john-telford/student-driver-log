@@ -1,7 +1,8 @@
 import { verifyCredentials } from '@/services/auth';
 import { issueApiToken } from '@/lib/api-auth';
 import { preflight, withCors } from '@/lib/cors';
-import { consumeAttempt, refundAttempt, signInKey } from '@/lib/rate-limit';
+import { clientIp, consumeAttempt, refundAttempt, signInKey } from '@/lib/rate-limit';
+import { securityEvent } from '@/lib/security-event';
 
 // POST /api/v1/auth/token — exchange { email, password } for a Bearer JWT.
 // No auth required (this is how you obtain auth). Public per the middleware
@@ -50,6 +51,7 @@ export async function POST(request: Request): Promise<Response> {
   const limitKey = signInKey('token', request.headers, email);
   const attempt = limitKey ? consumeAttempt(limitKey) : { limited: false as const };
   if (attempt.limited) {
+    securityEvent('signin.ratelimited', { surface: 'token', ip: clientIp(request.headers), email });
     return withCors(
       request,
       Response.json(
@@ -69,6 +71,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const user = await verifyCredentials({ email, password });
   if (!user) {
+    securityEvent('signin.failed', { surface: 'token', ip: clientIp(request.headers), email });
     return withCors(
       request,
       Response.json(

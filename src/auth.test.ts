@@ -133,6 +133,33 @@ describe('authorizeCredentials', () => {
 // Through Auth.js itself: a form POST to the credentials callback must reach
 // authorizeCredentials, so dropping the limiter from the provider's
 // `authorize` fails here.
+describe('authorizeCredentials security events', () => {
+  function captureEvents() {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    return () =>
+      warn.mock.calls
+        .map((c) => String(c[0]))
+        .filter((line) => line.startsWith('SEC '))
+        .map((line) => JSON.parse(line.slice(4)) as Record<string, unknown>);
+  }
+
+  it('logs signin.failed for a wrong password, without the email', async () => {
+    const events = captureEvents();
+    await failTimes('192.0.2.20', 1);
+    expect(events()).toEqual([expect.objectContaining({ event: 'signin.failed', surface: 'web', ip: '192.0.2.20' })]);
+    expect(JSON.stringify(events())).not.toContain(CREDS.email);
+    vi.mocked(console.warn).mockRestore();
+  });
+
+  it('logs signin.ratelimited when the limit blocks an attempt', async () => {
+    await failTimes('192.0.2.21', 5);
+    const events = captureEvents();
+    await expectLimited('192.0.2.21');
+    expect(events()).toEqual([expect.objectContaining({ event: 'signin.ratelimited', surface: 'web', ip: '192.0.2.21' })]);
+    vi.mocked(console.warn).mockRestore();
+  });
+});
+
 describe('Auth.js credentials callback', () => {
   const BASE = 'http://localhost:3000/api/auth';
 
