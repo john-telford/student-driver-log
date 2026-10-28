@@ -70,4 +70,20 @@ describe('addStudentAction password rule', () => {
     expect(await studentExists('jimmy@example.com')).toBe(true);
     expect(redirect).toHaveBeenCalledWith('/dashboard');
   });
+
+  it('logs student.added for a new student and a duplicate email, without the email', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await addStudentAction(undefined, form('Kim Lee', 'kim@example.com', 'gravel-lantern-42'));
+    await addStudentAction(undefined, form('Kim Lee', 'kim@example.com', 'gravel-lantern-42'));
+    const lines = warn.mock.calls.map((c) => String(c[0])).filter((l) => l.startsWith('SEC '));
+    const events = lines.map((l) => JSON.parse(l.slice(4)));
+    expect(events).toEqual([
+      expect.objectContaining({ event: 'student.added', userId: 1, outcome: 'created' }),
+      expect.objectContaining({ event: 'student.added', userId: 1, outcome: 'duplicate_email' }),
+    ]);
+    expect(events[0].account).toMatch(/^[0-9a-f]{12}$/);
+    expect(events[0].account).toBe(events[1].account);
+    expect(lines.join('\n')).not.toContain('kim@example.com');
+    warn.mockRestore();
+  });
 });

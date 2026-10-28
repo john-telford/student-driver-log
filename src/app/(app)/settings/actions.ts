@@ -4,6 +4,7 @@ import { auth, signOut } from '@/auth';
 import { db } from '@/db';
 import { passwordResetTokens, trips, users } from '@/db/schema';
 import { eq, inArray, or } from 'drizzle-orm';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 export type DeleteAccountState = { error: string } | undefined;
 
@@ -13,6 +14,11 @@ export async function deleteAccountAction(
 ): Promise<DeleteAccountState> {
   const session = await auth();
   if (!session?.user?.id || session.user.userType !== 'parent') {
+    // The form is only shown to parents, so a signed-in student here means a
+    // hand-crafted action call.
+    if (session?.user?.id) {
+      securityEvent('web.forbidden', { surface: 'web', ip: await actionIp(), userId: Number(session.user.id), outcome: 'delete_account' });
+    }
     return { error: 'Not authorized.' };
   }
 
@@ -43,6 +49,7 @@ export async function deleteAccountAction(
     db.delete(users).where(inArray(users.id, studentIds)),
     db.delete(users).where(eq(users.id, parentId)),
   ]);
+  securityEvent('account.deleted', { surface: 'web', ip: await actionIp(), userId: parentId });
 
   // signOut redirects — throws NEXT_REDIRECT, which propagates normally.
   await signOut({ redirectTo: '/register' });

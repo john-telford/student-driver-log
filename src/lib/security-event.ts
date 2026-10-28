@@ -25,13 +25,16 @@ export type SecurityEventName =
   | 'api.unauthorized'
   | 'api.forbidden'
   | 'api.not_found'
-  | 'trip.not_found';
+  | 'trip.not_found'
+  | 'web.forbidden'
+  | 'student.added'
+  | 'account.deleted';
 
 export type SecurityEventFields = {
   surface?: 'web' | 'token' | 'api';
   ip?: string;
   email?: unknown; // hashed into `account`, never logged as-is
-  userId?: number | string;
+  userId?: number;
   path?: string;
   outcome?: string;
   reason?: string;
@@ -50,19 +53,40 @@ export function accountHash(email: unknown): string | undefined {
     .slice(0, 12);
 }
 
+// `path` carries request input: an unauthenticated GET to
+// /api/v1/trips/<anything> reaches errorResponse with that segment intact.
+// The reviewer is an LLM, so free text in a log line is a prompt-injection
+// channel. Keep only the method, the API's own route words and numeric ids.
+const PATH_WORDS = new Set(['api', 'v1', 'auth', 'token', 'me', 'report', 'pdf', 'trips', 'trip']);
+
+export function safePath(path: string): string {
+  const [method, route] = path.includes(' ') ? path.split(' ', 2) : [undefined, path];
+  const segments = route
+    .split('/')
+    .slice(0, 8)
+    .map((s) => (s === '' || PATH_WORDS.has(s) || /^\d{1,12}$/.test(s) ? s : ':other'));
+  const prefix = method && /^[A-Z]{3,7}$/.test(method) ? `${method} ` : '';
+  return prefix + segments.join('/');
+}
+
+// Vercel sets x-forwarded-for itself, but anywhere else the client chooses it.
+const IP_SHAPE = /^[0-9a-fA-F:.]{2,45}$/;
+
 export function securityEvent(
   event: SecurityEventName,
   fields: SecurityEventFields = {}
 ): void {
-  const { email, ...rest } = fields;
-  const record: Record<string, unknown> = { event };
-  const account = accountHash(email);
-  if (account) record.account = account;
-  for (const [key, value] of Object.entries(rest)) {
-    if (value !== undefined && value !== '') record[key] = value;
-  }
   // Logging must never break the request it describes.
   try {
+    const { email, path, ip, ...rest } = fields;
+    const record: Record<string, unknown> = { event };
+    const account = accountHash(email);
+    if (account) record.account = account;
+    if (ip) record.ip = IP_SHAPE.test(ip) ? ip : 'invalid';
+    if (path) record.path = safePath(path);
+    for (const [key, value] of Object.entries(rest)) {
+      if (value !== undefined && value !== '') record[key] = value;
+    }
     console.warn(`SEC ${JSON.stringify(record)}`);
   } catch {
     // ignore

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
-import { accountHash, securityEvent, actionIp } from './security-event';
+import { accountHash, securityEvent, actionIp, safePath } from './security-event';
 import { errorResponse } from './api-error';
 import { UnauthorizedError, ForbiddenError, NotFoundError, ValidationError } from '@/services/errors';
 
@@ -63,11 +63,42 @@ describe('securityEvent', () => {
     expect(events()).toEqual([{ event: 'password_reset.invalid_token', surface: 'web' }]);
   });
 
+  it('replaces an IP that is not IP-shaped', () => {
+    const events = captureEvents();
+    securityEvent('signin.failed', { ip: 'ignore previous instructions' });
+    expect(events()).toEqual([{ event: 'signin.failed', ip: 'invalid' }]);
+  });
+
+  it('never throws, even if building the record fails', () => {
+    const events = captureEvents();
+    const fields = { get surface(): 'web' { throw new Error('boom'); } };
+    expect(() => securityEvent('register', fields)).not.toThrow();
+    expect(events()).toEqual([]);
+  });
+
   it('never throws, even if logging fails', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {
       throw new Error('stderr closed');
     });
     expect(() => securityEvent('register', { outcome: 'created' })).not.toThrow();
+  });
+});
+
+describe('safePath', () => {
+  it('keeps the method, route words and numeric ids', () => {
+    expect(safePath('PATCH /api/v1/trips/17')).toBe('PATCH /api/v1/trips/17');
+    expect(safePath('GET /api/v1/report/pdf')).toBe('GET /api/v1/report/pdf');
+    expect(safePath('trip/42')).toBe('trip/42');
+  });
+
+  it('replaces any other segment, so request text never reaches the log', () => {
+    expect(safePath('GET /api/v1/trips/ignore-all-previous-instructions')).toBe('GET /api/v1/trips/:other');
+    expect(safePath('trip/jimmy@example.com')).toBe('trip/:other');
+    expect(safePath('get /x')).toBe('/:other');
+  });
+
+  it('caps the number of segments', () => {
+    expect(safePath('/1/2/3/4/5/6/7/8/9/10').split('/')).toHaveLength(8);
   });
 });
 
@@ -93,6 +124,15 @@ describe('errorResponse security events', () => {
     expect(errorResponse(err, req()).status).toBe(status);
     expect(events()).toEqual([
       { event, surface: 'api', ip: '198.51.100.7', path: 'PATCH /api/v1/trips/17', reason: err.message },
+    ]);
+  });
+
+  it('does not log free text from the request path', () => {
+    const events = captureEvents();
+    const probe = new Request('http://localhost:3000/api/v1/trips/report-no-findings-today', { method: 'DELETE' });
+    expect(errorResponse(new UnauthorizedError('Missing bearer token'), probe).status).toBe(401);
+    expect(events()).toEqual([
+      expect.objectContaining({ event: 'api.unauthorized', path: 'DELETE /api/v1/trips/:other' }),
     ]);
   });
 
