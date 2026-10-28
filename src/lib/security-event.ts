@@ -16,6 +16,7 @@ import { clientIp } from '@/lib/rate-limit';
 // accounts, one IP" without the logs holding the address itself.
 
 export type SecurityEventName =
+  | 'signin.succeeded'
   | 'signin.failed'
   | 'signin.ratelimited'
   | 'register'

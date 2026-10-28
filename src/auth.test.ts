@@ -130,9 +130,6 @@ describe('authorizeCredentials', () => {
   });
 });
 
-// Through Auth.js itself: a form POST to the credentials callback must reach
-// authorizeCredentials, so dropping the limiter from the provider's
-// `authorize` fails here.
 describe('authorizeCredentials security events', () => {
   function captureEvents() {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -151,6 +148,15 @@ describe('authorizeCredentials security events', () => {
     vi.mocked(console.warn).mockRestore();
   });
 
+  it('logs signin.succeeded with the user id, without the email', async () => {
+    const events = captureEvents();
+    await succeed('192.0.2.22');
+    expect(events()).toEqual([expect.objectContaining({ event: 'signin.succeeded', surface: 'web', ip: '192.0.2.22', userId: 42 })]);
+    expect(events()[0].account).toMatch(/^[0-9a-f]{12}$/);
+    expect(JSON.stringify(events())).not.toContain(CREDS.email);
+    vi.mocked(console.warn).mockRestore();
+  });
+
   it('logs signin.ratelimited when the limit blocks an attempt', async () => {
     await failTimes('192.0.2.21', 5);
     const events = captureEvents();
@@ -160,6 +166,9 @@ describe('authorizeCredentials security events', () => {
   });
 });
 
+// Through Auth.js itself: a form POST to the credentials callback must reach
+// authorizeCredentials, so dropping the limiter from the provider's
+// `authorize` fails here.
 describe('Auth.js credentials callback', () => {
   const BASE = 'http://localhost:3000/api/auth';
 

@@ -230,11 +230,18 @@ describe('POST /api/v1/auth/token security events', () => {
     vi.mocked(console.warn).mockRestore();
   });
 
-  it('logs nothing on a successful sign-in', async () => {
+  it('logs signin.succeeded with the user id and the same account hash as a failure', async () => {
     const events = captureEvents();
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    await POST(post({ email: 'jimmy@example.com', password: 'bad' }, undefined, '192.0.2.12'));
     vi.mocked(verifyCredentials).mockResolvedValue({ id: 42, name: 'Jimmy', email: 'jimmy@example.com', userType: 'student', parentId: 7 });
     expect((await POST(post({ email: 'jimmy@example.com', password: 'ok' }, undefined, '192.0.2.12'))).status).toBe(200);
-    expect(events()).toEqual([]);
+
+    const [failed, succeeded] = events();
+    expect(succeeded).toEqual({ event: 'signin.succeeded', surface: 'token', ip: '192.0.2.12', account: failed.account, userId: 42 });
+    const raw = vi.mocked(console.warn).mock.calls.map((c) => String(c[0])).join('\n');
+    expect(raw).not.toContain('jimmy@example.com');
+    expect(raw).not.toMatch(/eyJ/); // no JWT
     vi.mocked(console.warn).mockRestore();
   });
 });

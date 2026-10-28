@@ -54,6 +54,7 @@ export async function authorizeCredentials(
     return null;
   }
   if (limitKey) refundAttempt(limitKey);
+  securityEvent('signin.succeeded', { surface: 'web', ip: clientIp(request.headers), email: credentials.email, userId: user.id });
 
   return {
     id: String(user.id),

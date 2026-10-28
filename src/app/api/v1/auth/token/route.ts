@@ -88,6 +88,7 @@ export async function POST(request: Request): Promise<Response> {
 
   if (limitKey) refundAttempt(limitKey);
   const token = await issueApiToken(user);
+  securityEvent('signin.succeeded', { surface: 'token', ip: clientIp(request.headers), email, userId: user.id });
   // Never let an intermediary/proxy cache a bearer credential.
   return withCors(
     request,
