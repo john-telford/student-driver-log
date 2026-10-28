@@ -42,6 +42,13 @@ beforeAll(async () => {
   await db.insert(passwordResetTokens).values({ userId: 2, tokenHash: 'h', expiresAt: '2099-01-01' });
 });
 
+function secEvents(warn: { mock: { calls: unknown[][] } }) {
+  return warn.mock.calls
+    .map((c) => String(c[0]))
+    .filter((l) => l.startsWith('SEC '))
+    .map((l) => JSON.parse(l.slice(4)));
+}
+
 describe('deleteAccountAction', () => {
   it('refuses without the typed confirmation', async () => {
     const form = new FormData();
@@ -55,10 +62,15 @@ describe('deleteAccountAction', () => {
     session.user = { id: '2', userType: 'student' };
     const form = new FormData();
     form.set('confirm', 'DELETE');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       expect(await deleteAccountAction(undefined, form)).toEqual({ error: 'Not authorized.' });
+      expect(secEvents(warn)).toEqual([
+        { event: 'web.forbidden', surface: 'web', userId: 2, outcome: 'delete_account' },
+      ]);
     } finally {
       session.user = { id: '1', userType: 'parent' };
+      warn.mockRestore();
     }
     expect(await db.select().from(users)).toHaveLength(5);
   });
@@ -66,7 +78,10 @@ describe('deleteAccountAction', () => {
   it("deletes the parent, its students, their trips and tokens, and nobody else's, with FKs on", async () => {
     const form = new FormData();
     form.set('confirm', 'DELETE');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await deleteAccountAction(undefined, form);
+    expect(secEvents(warn)).toEqual([{ event: 'account.deleted', surface: 'web', userId: 1 }]);
+    warn.mockRestore();
 
     expect((await db.select().from(users)).map((u) => u.id).sort()).toEqual([4, 5]);
     expect((await db.select().from(trips)).map((t) => t.studentId)).toEqual([5]);

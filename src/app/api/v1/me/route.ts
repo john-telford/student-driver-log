@@ -17,7 +17,7 @@ export async function GET(request: Request): Promise<Response> {
       Response.json(profile, { headers: { 'Cache-Control': 'no-store' } })
     );
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 

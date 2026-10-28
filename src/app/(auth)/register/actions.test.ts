@@ -66,4 +66,19 @@ describe('registerAction password rule', () => {
     expect(await userExists('pat@example.com')).toBe(true);
     expect(signIn).toHaveBeenCalledOnce();
   });
+
+  it('logs register events for a new account and a duplicate email, without the email', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await registerAction(undefined, form('Sam Ray', 'sam@example.com', 'gravel-lantern-42'));
+    await registerAction(undefined, form('Sam Ray', 'sam@example.com', 'gravel-lantern-42'));
+    const lines = warn.mock.calls.map((c) => String(c[0])).filter((l) => l.startsWith('SEC '));
+    const events = lines.map((l) => JSON.parse(l.slice(4)));
+    expect(events).toEqual([
+      expect.objectContaining({ event: 'register', outcome: 'created' }),
+      expect.objectContaining({ event: 'register', outcome: 'duplicate_email' }),
+    ]);
+    expect(events[0].account).toBe(events[1].account);
+    expect(lines.join('\n')).not.toContain('sam@example.com');
+    warn.mockRestore();
+  });
 });

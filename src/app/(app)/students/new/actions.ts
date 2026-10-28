@@ -7,6 +7,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { validatePassword } from '@/lib/password';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 export type AddStudentState = {
   errors?: {
@@ -23,6 +24,9 @@ export async function addStudentAction(
 ): Promise<AddStudentState> {
   const session = await auth();
   if (!session?.user || session.user.userType !== 'parent') {
+    if (session?.user?.id) {
+      securityEvent('web.forbidden', { surface: 'web', ip: await actionIp(), userId: Number(session.user.id), outcome: 'add_student' });
+    }
     return { errors: { form: 'Unauthorized.' } };
   }
 
@@ -36,7 +40,10 @@ export async function addStudentAction(
   if (passwordError) return { errors: { password: passwordError } };
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
-  if (existing) return { errors: { email: 'That email is already in use.' } };
+  if (existing) {
+    securityEvent('student.added', { surface: 'web', ip: await actionIp(), userId: Number(session.user.id), email, outcome: 'duplicate_email' });
+    return { errors: { email: 'That email is already in use.' } };
+  }
 
   const passwordHash = await bcrypt.hash(password, 12);
   await db.insert(users).values({
@@ -46,6 +53,7 @@ export async function addStudentAction(
     userType: 'student',
     parentId: Number(session.user.id),
   });
+  securityEvent('student.added', { surface: 'web', ip: await actionIp(), userId: Number(session.user.id), email, outcome: 'created' });
 
   redirect('/dashboard');
 }

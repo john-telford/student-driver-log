@@ -1,7 +1,8 @@
 import NextAuth, { CredentialsSignin, type DefaultSession, type User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { verifyCredentials } from '@/services/auth';
-import { consumeAttempt, refundAttempt, signInKey } from '@/lib/rate-limit';
+import { clientIp, consumeAttempt, refundAttempt, signInKey } from '@/lib/rate-limit';
+import { securityEvent } from '@/lib/security-event';
 
 // Extend next-auth types to carry userType and parentId through the session
 declare module 'next-auth' {
@@ -39,14 +40,21 @@ export async function authorizeCredentials(
   // Counted before the password check (see lib/rate-limit). Without an email
   // there's no key, and verifyCredentials rejects it without a bcrypt check.
   const limitKey = signInKey('web', request.headers, credentials.email);
-  if (limitKey && consumeAttempt(limitKey).limited) throw new RateLimitedSignin();
+  if (limitKey && consumeAttempt(limitKey).limited) {
+    securityEvent('signin.ratelimited', { surface: 'web', ip: clientIp(request.headers), email: credentials.email });
+    throw new RateLimitedSignin();
+  }
 
   const user = await verifyCredentials({
     email: credentials.email as string,
     password: credentials.password as string,
   });
-  if (!user) return null;
+  if (!user) {
+    securityEvent('signin.failed', { surface: 'web', ip: clientIp(request.headers), email: credentials.email });
+    return null;
+  }
   if (limitKey) refundAttempt(limitKey);
+  securityEvent('signin.succeeded', { surface: 'web', ip: clientIp(request.headers), email: credentials.email, userId: user.id });
 
   return {
     id: String(user.id),

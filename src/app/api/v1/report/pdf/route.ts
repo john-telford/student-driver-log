@@ -30,7 +30,7 @@ export async function GET(request: Request): Promise<Response> {
       })
     );
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 

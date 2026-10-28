@@ -194,6 +194,58 @@ describe('POST /api/v1/auth/token rate limiting', () => {
   });
 });
 
+describe('POST /api/v1/auth/token security events', () => {
+  function captureEvents() {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    return () =>
+      warn.mock.calls
+        .map((c) => String(c[0]))
+        .filter((line) => line.startsWith('SEC '))
+        .map((line) => JSON.parse(line.slice(4)) as Record<string, unknown>);
+  }
+
+  it('logs signin.failed with the IP and a hashed account, never the email or password', async () => {
+    const events = captureEvents();
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    await POST(post({ email: 'sec-a@example.com', password: 'hunter22' }, undefined, '192.0.2.10'));
+
+    const logged = events();
+    expect(logged).toHaveLength(1);
+    expect(logged[0]).toMatchObject({ event: 'signin.failed', surface: 'token', ip: '192.0.2.10' });
+    expect(logged[0].account).toMatch(/^[0-9a-f]{12}$/);
+    const raw = vi.mocked(console.warn).mock.calls.map((c) => String(c[0])).join('\n');
+    expect(raw).not.toContain('sec-a@example.com');
+    expect(raw).not.toContain('hunter22');
+    vi.mocked(console.warn).mockRestore();
+  });
+
+  it('logs signin.ratelimited on the limited attempt', async () => {
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    for (let i = 0; i < 5; i++) {
+      await POST(post({ email: 'sec-b@example.com', password: 'bad' }, undefined, '192.0.2.11'));
+    }
+    const events = captureEvents();
+    expect((await POST(post({ email: 'sec-b@example.com', password: 'bad' }, undefined, '192.0.2.11'))).status).toBe(429);
+    expect(events()).toEqual([expect.objectContaining({ event: 'signin.ratelimited', surface: 'token', ip: '192.0.2.11' })]);
+    vi.mocked(console.warn).mockRestore();
+  });
+
+  it('logs signin.succeeded with the user id and the same account hash as a failure', async () => {
+    const events = captureEvents();
+    vi.mocked(verifyCredentials).mockResolvedValue(null);
+    await POST(post({ email: 'jimmy@example.com', password: 'bad' }, undefined, '192.0.2.12'));
+    vi.mocked(verifyCredentials).mockResolvedValue({ id: 42, name: 'Jimmy', email: 'jimmy@example.com', userType: 'student', parentId: 7 });
+    expect((await POST(post({ email: 'jimmy@example.com', password: 'ok' }, undefined, '192.0.2.12'))).status).toBe(200);
+
+    const [failed, succeeded] = events();
+    expect(succeeded).toEqual({ event: 'signin.succeeded', surface: 'token', ip: '192.0.2.12', account: failed.account, userId: 42 });
+    const raw = vi.mocked(console.warn).mock.calls.map((c) => String(c[0])).join('\n');
+    expect(raw).not.toContain('jimmy@example.com');
+    expect(raw).not.toMatch(/eyJ/); // no JWT
+    vi.mocked(console.warn).mockRestore();
+  });
+});
+
 describe('OPTIONS /api/v1/auth/token (CORS preflight)', () => {
   it('returns 204 and allows an allow-listed origin', async () => {
     const res = await OPTIONS(post({}, ALLOWED));

@@ -45,7 +45,7 @@ export async function PATCH(
     });
     return withCors(request, Response.json(trip));
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 
@@ -63,7 +63,7 @@ export async function DELETE(
     await deleteTrip(tripId, { studentId });
     return withCors(request, new Response(null, { status: 204 }));
   } catch (err) {
-    return withCors(request, errorResponse(err));
+    return withCors(request, errorResponse(err, request));
   }
 }
 

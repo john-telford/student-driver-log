@@ -7,6 +7,7 @@ import { signIn } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { validatePassword } from '@/lib/password';
+import { actionIp, securityEvent } from '@/lib/security-event';
 
 export type RegisterState = { errors: Record<string, string> } | undefined;
 
@@ -37,6 +38,7 @@ export async function registerAction(
     .where(eq(users.email, email));
 
   if (existing) {
+    securityEvent('register', { surface: 'web', ip: await actionIp(), email, outcome: 'duplicate_email' });
     return { errors: { email: 'An account with that email already exists.' } };
   }
 
@@ -48,6 +50,7 @@ export async function registerAction(
     name,
     userType: 'parent',
   });
+  securityEvent('register', { surface: 'web', ip: await actionIp(), email, outcome: 'created' });
 
   try {
     await signIn('credentials', {

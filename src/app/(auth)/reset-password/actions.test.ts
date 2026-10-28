@@ -100,4 +100,17 @@ describe('resetPasswordAction password rule', () => {
     expect(after.used).not.toBeNull();
     expect(redirect).toHaveBeenCalledWith('/login?reset=1');
   });
+
+  it('logs password_reset.invalid_token for an unknown or used token', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const f = new FormData();
+    f.set('token', 'not-a-real-token');
+    f.set('password', 'gravel-lantern-42');
+    expect(await resetPasswordAction(undefined, f)).toEqual({
+      error: 'This link has expired or has already been used. Request a new one.',
+    });
+    const events = warn.mock.calls.map((c) => String(c[0])).filter((l) => l.startsWith('SEC ')).map((l) => JSON.parse(l.slice(4)));
+    expect(events).toEqual([expect.objectContaining({ event: 'password_reset.invalid_token', surface: 'web' })]);
+    warn.mockRestore();
+  });
 });
