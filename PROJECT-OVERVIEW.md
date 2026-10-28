@@ -40,7 +40,7 @@ Parent/Student ──view──► Report (printable SOS format)
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | Next.js 15 (App Router) + TypeScript | Server Components by default |
+| Framework | Next.js 16 (App Router) + TypeScript | Server Components by default |
 | Database | libSQL / SQLite (local file) → Turso (prod) | Serverless-compatible SQLite |
 | ORM | Drizzle ORM | Schema-first, type-safe, migrations |
 | Auth | Auth.js v5 — credentials provider | JWT sessions; bcrypt password hashing |
