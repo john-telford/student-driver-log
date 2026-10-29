@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 
 // requireApiUser is mocked (auth is exercised in api-auth.test.ts);
-// resolveApiStudentId stays real so the parent→403 policy is tested for real.
+// resolveApiStudentId stays real so the parent studentId policy is tested for real.
+vi.mock('@/services/accounts', () => ({ assertParentOwnsStudent: vi.fn() }));
 vi.mock('@/lib/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-auth')>();
   return { ...actual, requireApiUser: vi.fn() };
@@ -62,7 +63,7 @@ describe('GET /api/v1/report', () => {
     expect(getReport).not.toHaveBeenCalled();
   });
 
-  it('returns 403 for a parent token (parent API not supported in v1)', async () => {
+  it('returns 400 for a parent token with no studentId', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
       userId: 1,
       userType: 'parent',
@@ -70,7 +71,7 @@ describe('GET /api/v1/report', () => {
     });
 
     const res = await GET(get());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(400);
     expect(getReport).not.toHaveBeenCalled();
   });
 });

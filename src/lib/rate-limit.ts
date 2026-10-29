@@ -73,3 +73,16 @@ export function signInKey(
   if (!normalized) return null;
   return `${surface}:${clientIp(headers)}:${normalized}`;
 }
+
+// The key for the native client's account endpoints. Registration is counted
+// per client IP (there's no account yet to key on); a reset request per IP and
+// email, like sign-in, so one family's typo can't block a school's Wi-Fi.
+export function accountKey(
+  scope: 'register' | 'reset',
+  headers: Headers,
+  email?: unknown
+): string {
+  if (scope === 'register') return `register:${clientIp(headers)}`;
+  const normalized = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  return `reset:${clientIp(headers)}:${normalized}`;
+}

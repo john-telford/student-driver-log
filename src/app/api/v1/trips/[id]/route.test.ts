@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 
+vi.mock('@/services/accounts', () => ({ assertParentOwnsStudent: vi.fn() }));
 vi.mock('@/lib/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-auth')>();
   return { ...actual, requireApiUser: vi.fn() };
@@ -97,14 +98,14 @@ describe('PATCH /api/v1/trips/:id', () => {
     expect(updateTrip).not.toHaveBeenCalled();
   });
 
-  it('returns 403 for a parent token', async () => {
+  it('returns 400 for a parent token with no studentId', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
       userId: 1,
       userType: 'parent',
       parentId: null,
     });
     const res = await PATCH(patch('10', { tripDate: '2026-01-01' }), ctx('10'));
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(400);
     expect(updateTrip).not.toHaveBeenCalled();
   });
 });
@@ -143,14 +144,14 @@ describe('DELETE /api/v1/trips/:id', () => {
     expect(deleteTrip).not.toHaveBeenCalled();
   });
 
-  it('returns 403 for a parent token', async () => {
+  it('returns 400 for a parent token with no studentId', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
       userId: 1,
       userType: 'parent',
       parentId: null,
     });
     const res = await DELETE(del('10'), ctx('10'));
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(400);
     expect(deleteTrip).not.toHaveBeenCalled();
   });
 });

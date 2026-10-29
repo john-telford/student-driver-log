@@ -7,7 +7,7 @@ import { getReport } from '@/services/report';
 export async function GET(request: Request): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
     const report = await getReport(studentId);
     return withCors(request, Response.json(report));
   } catch (err) {
