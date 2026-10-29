@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { UnauthorizedError, ForbiddenError } from '@/services/errors';
+import { UnauthorizedError, NotFoundError, ValidationError } from '@/services/errors';
+import { assertParentOwnsStudent } from '@/services/accounts';
 import type { UserType } from '@/db/schema';
 
 // Bearer-token auth for the `/api/v1` surface. This issues and verifies a
@@ -81,13 +82,36 @@ export async function requireApiUser(request: Request): Promise<ApiCaller> {
   }
 }
 
-// Resolve which student's data an API caller is acting on. v1 iOS = the student
-// logs in as their own account, so studentId is simply their own userId
-// (architecture D8). Parent-on-iOS is a deferred fast-follow: a parent caller
-// has no way to specify a student yet, so reject explicitly rather than guess.
-export function resolveApiStudentId(caller: ApiCaller): number {
+// Resolve which student's data an API caller is acting on.
+//
+// - A student acts on their own data. A `studentId` query parameter is
+//   optional for them; if present it must be their own id (404 otherwise).
+// - A parent must name one of their own students with `?studentId=` (400 if
+//   it's missing or malformed, 404 if it isn't theirs, so a parent can't probe
+//   other families' ids). Parent support on iOS: App Review 2026-10-29.
+export async function resolveApiStudentId(caller: ApiCaller, request: Request): Promise<number> {
+  const raw = new URL(request.url).searchParams.get('studentId');
+  const requested = raw === null ? null : parseStudentId(raw);
+
   if (caller.userType === 'student') {
+    if (requested !== null && requested !== caller.userId) {
+      throw new NotFoundError('Student not found.');
+    }
     return caller.userId;
   }
-  throw new ForbiddenError('Parent API access is not supported yet');
+
+  if (requested === null) {
+    throw new ValidationError('Choose a student.', { studentId: 'studentId is required for parent accounts.' });
+  }
+  await assertParentOwnsStudent(caller.userId, requested);
+  return requested;
+}
+
+// Positive canonical decimal integers only, like trip ids.
+function parseStudentId(raw: string): number {
+  const id = /^\d{1,12}$/.test(raw) ? Number(raw) : NaN;
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new ValidationError('Invalid student id.', { studentId: 'Invalid student id.' });
+  }
+  return id;
 }

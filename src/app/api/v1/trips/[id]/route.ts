@@ -26,7 +26,7 @@ export async function PATCH(
 ): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
     const { id } = await params;
     const tripId = parseTripId(id);
 
@@ -56,7 +56,7 @@ export async function DELETE(
 ): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
     const { id } = await params;
     const tripId = parseTripId(id);
 

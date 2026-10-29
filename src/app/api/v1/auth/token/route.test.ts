@@ -3,6 +3,7 @@ import { jwtVerify } from 'jose';
 
 // Mock the credential check so the route test is about HTTP behavior + token
 // issuance, not the bcrypt/DB path (covered in services/auth.test.ts).
+vi.mock('@/services/accounts', () => ({ assertParentOwnsStudent: vi.fn() }));
 vi.mock('@/services/auth', () => ({ verifyCredentials: vi.fn() }));
 
 import { verifyCredentials } from '@/services/auth';

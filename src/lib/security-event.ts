@@ -58,7 +58,10 @@ export function accountHash(email: unknown): string | undefined {
 // /api/v1/trips/<anything> reaches errorResponse with that segment intact.
 // The reviewer is an LLM, so free text in a log line is a prompt-injection
 // channel. Keep only the method, the API's own route words and numeric ids.
-const PATH_WORDS = new Set(['api', 'v1', 'auth', 'token', 'me', 'report', 'pdf', 'trips', 'trip']);
+const PATH_WORDS = new Set([
+  'api', 'v1', 'auth', 'token', 'me', 'report', 'pdf', 'trips', 'trip',
+  'register', 'forgot-password', 'students', 'account',
+]);
 
 export function safePath(path: string): string {
   const [method, route] = path.includes(' ') ? path.split(' ', 2) : [undefined, path];

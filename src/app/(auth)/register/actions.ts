@@ -1,60 +1,37 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 import { signIn } from '@/auth';
-import { db } from '@/db';
-import { users } from '@/db/schema';
-import { validatePassword } from '@/lib/password';
 import { actionIp, securityEvent } from '@/lib/security-event';
+import { registerParent } from '@/services/accounts';
+import { ValidationError } from '@/services/errors';
 
 export type RegisterState = { errors: Record<string, string> } | undefined;
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function registerAction(
   _prev: RegisterState,
   formData: FormData
 ): Promise<RegisterState> {
-  const name = (formData.get('name') as string)?.trim();
-  const email = (formData.get('email') as string)?.trim().toLowerCase();
-  const password = (formData.get('password') as string) ?? '';
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const password = formData.get('password') ?? '';
 
-  const errors: Record<string, string> = {};
-
-  if (!name) errors.name = 'Name is required.';
-  if (!email || !EMAIL_RE.test(email)) {
-    errors.email = 'A valid email address is required.';
+  try {
+    await registerParent({ name, email, password });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      if (err.fields?.email === 'An account with that email already exists.') {
+        securityEvent('register', { surface: 'web', ip: await actionIp(), email, outcome: 'duplicate_email' });
+      }
+      return { errors: err.fields ?? { form: err.message } };
+    }
+    throw err;
   }
-  const passwordError = validatePassword(password, { name, email });
-  if (passwordError) errors.password = passwordError;
-
-  if (Object.keys(errors).length > 0) return { errors };
-
-  const [existing] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.email, email));
-
-  if (existing) {
-    securityEvent('register', { surface: 'web', ip: await actionIp(), email, outcome: 'duplicate_email' });
-    return { errors: { email: 'An account with that email already exists.' } };
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  await db.insert(users).values({
-    email,
-    passwordHash,
-    name,
-    userType: 'parent',
-  });
   securityEvent('register', { surface: 'web', ip: await actionIp(), email, outcome: 'created' });
 
   try {
     await signIn('credentials', {
-      email,
+      email: String(email).trim().toLowerCase(),
       password,
       redirectTo: '/dashboard',
     });

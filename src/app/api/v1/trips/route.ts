@@ -4,11 +4,12 @@ import { preflight, withCors } from '@/lib/cors';
 import { ValidationError } from '@/services/errors';
 import { listTrips, createTrip } from '@/services/trips';
 
-// GET /api/v1/trips — the caller's own trips, newest first.
+// GET /api/v1/trips — a student's trips, newest first: the caller's own, or
+// for a parent the student named by ?studentId= (see resolveApiStudentId).
 export async function GET(request: Request): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
     const trips = await listTrips(studentId);
     return withCors(request, Response.json(trips));
   } catch (err) {
@@ -16,11 +17,12 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-// POST /api/v1/trips — create a trip for the caller's student, returns it (201).
+// POST /api/v1/trips — create a trip for that student, returns it (201).
+// createdBy is the caller, so a parent-logged trip records the parent.
 export async function POST(request: Request): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
 
     let body: unknown;
     try {
@@ -34,7 +36,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const trip = await createTrip(body as Record<string, unknown>, {
       studentId,
-      createdBy: studentId,
+      createdBy: caller.userId,
     });
     return withCors(request, Response.json(trip, { status: 201 }));
   } catch (err) {

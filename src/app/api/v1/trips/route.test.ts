@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 
 // requireApiUser is mocked (auth is exercised in api-auth.test.ts);
-// resolveApiStudentId stays real so the parent→403 policy is tested for real.
+// resolveApiStudentId stays real so the parent studentId policy is tested for real.
+vi.mock('@/services/accounts', () => ({ assertParentOwnsStudent: vi.fn() }));
 vi.mock('@/lib/api-auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api-auth')>();
   return { ...actual, requireApiUser: vi.fn() };
@@ -29,6 +30,32 @@ function get(origin?: string): Request {
   });
 }
 
+describe('parent callers', () => {
+  const parent = { userId: 7, userType: 'parent' as const, parentId: null };
+
+  it("lists the named student's trips for their parent", async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(parent);
+    vi.mocked(listTrips).mockResolvedValue([] as never);
+    const res = await GET(new Request('http://localhost:3000/api/v1/trips?studentId=42'));
+    expect(res.status).toBe(200);
+    expect(listTrips).toHaveBeenCalledWith(42);
+  });
+
+  it('records the parent as createdBy on a trip they log', async () => {
+    vi.mocked(requireApiUser).mockResolvedValue(parent);
+    vi.mocked(createTrip).mockResolvedValue({ id: 1 } as never);
+    const res = await POST(
+      new Request('http://localhost:3000/api/v1/trips?studentId=42', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ tripDate: '2026-10-01' }),
+      })
+    );
+    expect(res.status).toBe(201);
+    expect(createTrip).toHaveBeenCalledWith({ tripDate: '2026-10-01' }, { studentId: 42, createdBy: 7 });
+  });
+});
+
 describe('GET /api/v1/trips', () => {
   it('returns the caller trips on a valid student token', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
@@ -55,7 +82,7 @@ describe('GET /api/v1/trips', () => {
     expect(listTrips).not.toHaveBeenCalled();
   });
 
-  it('returns 403 for a parent token (parent API not supported in v1)', async () => {
+  it('returns 400 for a parent token with no studentId', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
       userId: 1,
       userType: 'parent',
@@ -63,7 +90,7 @@ describe('GET /api/v1/trips', () => {
     });
 
     const res = await GET(get());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(400);
     expect(listTrips).not.toHaveBeenCalled();
   });
 });
@@ -120,14 +147,14 @@ describe('POST /api/v1/trips', () => {
     expect(createTrip).not.toHaveBeenCalled();
   });
 
-  it('returns 403 for a parent token', async () => {
+  it('returns 400 for a parent token with no studentId', async () => {
     vi.mocked(requireApiUser).mockResolvedValue({
       userId: 1,
       userType: 'parent',
       parentId: null,
     });
     const res = await POST(post({ tripDate: '2026-01-01' }));
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(400);
     expect(createTrip).not.toHaveBeenCalled();
   });
 });

@@ -6,18 +6,24 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { buildReportPdf } from '@/app/api/report/pdf/build';
 
-// GET /api/v1/report/pdf — the caller's own driving log as a PDF. v1 callers
-// are always students (resolveApiStudentId rejects parents), so parentName is
-// always null here — matching the existing web route's own student branch.
+// GET /api/v1/report/pdf — a student's driving log as a PDF: the caller's own,
+// or for a parent the student named by ?studentId=. As on the web route, the
+// parent's name goes on the log only when a parent downloads it.
 export async function GET(request: Request): Promise<Response> {
   try {
     const caller = await requireApiUser(request);
-    const studentId = resolveApiStudentId(caller);
+    const studentId = await resolveApiStudentId(caller, request);
 
     const [student] = await db.select({ name: users.name }).from(users).where(eq(users.id, studentId));
     const studentName = student?.name ?? null;
 
-    const { buffer, filename } = await buildReportPdf(studentId, studentName, null);
+    let parentName: string | null = null;
+    if (caller.userType === 'parent') {
+      const [parent] = await db.select({ name: users.name }).from(users).where(eq(users.id, caller.userId));
+      parentName = parent?.name ?? null;
+    }
+
+    const { buffer, filename } = await buildReportPdf(studentId, studentName, parentName);
 
     return withCors(
       request,
