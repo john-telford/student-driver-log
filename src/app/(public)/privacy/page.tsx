@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           <li><span className="font-bold">Driving sessions</span> — date, duration (day/night minutes), location type, weather conditions, and optional notes that you enter.</li>
           <li><span className="font-bold">Student accounts</span> — names and emails of student accounts you create as a parent.</li>
           <li><span className="font-bold">Cookies</span> — on the website, used to keep you logged in (8-hour expiry). A separate cookie remembers which student account a parent last selected, for 30 days.</li>
-          <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. It stores your email, password and an access token in the iOS Keychain on your device (instead of cookies), and remembers the last email you used to prefill sign-in. Your email and password are sent only to sign in; the access token, which identifies your account (your account ID), goes with every request to our server.</li>
+          <li><span className="font-bold">iOS app</span> — signs in with the same email and password and sends the same driving-session data. A parent can also register, add student accounts and request a password reset in the app, which sends the same name, email and password as the website&apos;s forms. It stores your email, password and an access token in the iOS Keychain on your device (instead of cookies), and remembers the last email you used to prefill sign-in. Your email and password are sent only to sign in; the access token, which identifies your account (your account ID), goes with every request to our server.</li>
           <li><span className="font-bold">Technical data</span> — our hosting provider records IP addresses in its request logs. Sign-in on the website and in the iOS app counts attempts by IP address and the email entered, to limit repeated failed attempts; that count is held only in the server&apos;s memory, never in our database, and stops applying after 15 minutes.</li>
         </ul>
       </section>
@@ -85,10 +85,11 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="font-black uppercase tracking-widest text-primary">Data retention & deletion</h2>
         <p>
-          Your account data is kept for as long as your account exists. A parent or guardian can delete
-          their account on the website: sign in to the parent account and go
-          to <span className="font-bold">Settings → Danger Zone → Delete My Account</span>. Deleting a parent
-          account also deletes all of its student accounts and every driving session.
+          Your account data is kept for as long as your account exists. You can delete your account in
+          the iOS app (<span className="font-bold">Account → Delete account</span>) or, for a parent or
+          guardian, on the website (<span className="font-bold">Settings → Danger Zone → Delete My
+          Account</span>). Deleting a parent account also deletes all of its student accounts and every
+          driving session.
         </p>
         <p>
           Deletion removes your data from our live database immediately and can&apos;t be undone.
@@ -96,8 +97,8 @@ export default function PrivacyPage() {
           email delivery logs) are deleted on their own schedules.
         </p>
         <p>
-          The iOS app cannot delete an account. A student account cannot be deleted on its own; it
-          is deleted with the parent account it belongs to.
+          A student can delete their own account in the iOS app. That deletes the student and their
+          driving sessions; the parent account stays.
         </p>
       </section>
 

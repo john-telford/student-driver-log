@@ -31,9 +31,10 @@ export default function FaqPage() {
             coming to the App Store. On your home screen the app is named Driver Log.
           </p>
           <p>
-            The app is for students. A parent or guardian creates the student account here on
-            the website, and the student signs in to the app with it. Parent accounts are managed
-            on the website.
+            A parent or guardian creates an account and adds each student, in the app or here on
+            the website. Students sign in to log their drives; parents can switch between their
+            students and see each one&apos;s progress. You can delete your account in the app,
+            under Account.
           </p>
         </A>
       </section>

@@ -17,7 +17,10 @@ describe('PrivacyPage', () => {
 
   it('states what deletion does and where it happens', () => {
     expect(html).toContain('Deleting a parent account also deletes all of its student accounts');
-    expect(html).toContain('The iOS app cannot delete an account.');
+    // App Review 2026-10-29 (Guideline 5.1.1(v)): the iOS app deletes accounts too.
+    expect(html).toContain('Account → Delete account');
+    expect(html).toContain('A student can delete their own account in the iOS app.');
+    expect(html).not.toContain('The iOS app cannot delete an account.');
   });
 
   // Decision 178: no retention number, and no "irreversible" claim that
