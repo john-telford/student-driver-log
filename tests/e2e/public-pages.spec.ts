@@ -17,7 +17,7 @@ test('/privacy is public and covers the iOS app', async ({ page }) => {
   await expect(page).toHaveURL('/privacy');
   await expect(page.locator('main')).toContainText('Teen Driver Log');
   await expect(page.locator('main')).toContainText('The iOS app contains no analytics and no tracking');
-  await expect(page.locator('main')).toContainText('The iOS app cannot delete an account.');
+  await expect(page.locator('main')).toContainText('A student can delete their own account in the iOS app.');
   await expect(page.locator('main')).toContainText(
     "Deletion removes your data from our live database immediately and can't be undone.",
   );

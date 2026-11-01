@@ -23,8 +23,10 @@ describe('SupportPage', () => {
     expect(html).toContain('Teen Driver Log');
     expect(html).toContain('Settings → Danger Zone');
     expect(html).toContain('Delete My Account');
-    expect(html).toContain('A student account cannot be deleted on its own');
-    expect(html).toContain('The iOS app cannot delete an account.');
+    // App Review 2026-10-29 (Guideline 5.1.1(v)): the iOS app deletes accounts too.
+    expect(html).toContain('Account → Delete account');
+    expect(html).toContain('the parent account stays');
+    expect(html).not.toContain('The iOS app cannot delete an account.');
   });
 
   // Decision 178's short form: immediate in the live database, not in backups.
